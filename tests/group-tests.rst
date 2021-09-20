@@ -9,4 +9,5 @@ Tests
    topic-simple
    exercise-simple
    task-simple
+   dependency-error/group
    graph

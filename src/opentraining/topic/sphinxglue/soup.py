@@ -5,8 +5,10 @@ from ..task import Task
 from ..group import Group
 from ..errors import TopicError
 
+import logging
+logger = logging.getLogger(__name__)
 
-def sphinx_add_topic(app, docname, title, path, dependencies):
+def sphinx_add_topic(app, docname, title, path, jjj, dependencies):
     if hasattr(app, 'ot_soup'):
         raise TopicError('Soup already created, cannot add one more topic')
     if not hasattr(app.env, 'ot_elements'):
@@ -16,10 +18,11 @@ def sphinx_add_topic(app, docname, title, path, dependencies):
         'type': 'topic',
         'title': title,
         'path': path,
+        'jjj': jjj,
         'dependencies': dependencies,
     }
 
-def sphinx_add_exercise(app, docname, title, path, dependencies):
+def sphinx_add_exercise(app, docname, title, path, jjj, dependencies):
     if hasattr(app, 'ot_soup'):
         raise TopicError('Soup already created, cannot add one more topic')
     if not hasattr(app.env, 'ot_elements'):
@@ -29,10 +32,11 @@ def sphinx_add_exercise(app, docname, title, path, dependencies):
         'type': 'exercise',
         'title': title,
         'path': path,
+        'jjj': jjj,
         'dependencies': dependencies,
     }
 
-def sphinx_add_task(app, docname, title, path, dependencies, 
+def sphinx_add_task(app, docname, title, path, jjj, dependencies, 
                     responsible, initial_estimate, spent, percent_done):
     if hasattr(app, 'ot_soup'):
         raise TopicError('Soup already created, cannot add one more topic')
@@ -43,6 +47,7 @@ def sphinx_add_task(app, docname, title, path, dependencies,
         'type': 'task',
         'title': title,
         'path': path,
+        'jjj': jjj,
         'dependencies': dependencies,
         'responsible': responsible,
         'initial_estimate': initial_estimate,
@@ -50,7 +55,7 @@ def sphinx_add_task(app, docname, title, path, dependencies,
         'percent_done': percent_done,
     }
 
-def sphinx_add_group(app, docname, title, path):
+def sphinx_add_group(app, docname, title, path, jjj):
     if hasattr(app, 'ot_soup'):
         raise TopicError('Soup already created, cannot add one more group')
     if not hasattr(app.env, 'ot_elements'):
@@ -60,6 +65,7 @@ def sphinx_add_group(app, docname, title, path):
         'type': 'group',
         'title': title,
         'path': path,
+        'jjj': jjj,
     }
 
 def sphinx_purge_doc(app, env, docname):
@@ -76,17 +82,22 @@ def sphinx_create_soup(app):
         if ty == 'topic':
             app.ot_soup.add_element(
                 Topic(title=elem['title'], path=elem['path'], docname=docname,
-                      dependencies=elem['dependencies']))
+                      dependencies=elem['dependencies'], 
+                      jjj=elem['jjj'],
+            ))
         elif ty == 'exercise':
             app.ot_soup.add_element(
                 Exercise(title=elem['title'], path=elem['path'], docname=docname,
-                         dependencies=elem['dependencies']))
+                         dependencies=elem['dependencies'],
+                         jjj=elem['jjj'],
+                         ))
         elif ty == 'task':
             app.ot_soup.add_element(
                 Task(title=elem['title'],
                      path=elem['path'],
                      docname=docname,
                      dependencies=elem['dependencies'],
+                     jjj=elem['jjj'],
                      responsible=elem['responsible'],
                      initial_estimate=elem['initial_estimate'],
                      spent=elem['spent'],
@@ -94,7 +105,9 @@ def sphinx_create_soup(app):
                 ))
         elif ty == 'group':
             app.ot_soup.add_element(
-                Group(title=elem['title'], path=elem['path'], docname=docname))
+                Group(title=elem['title'], path=elem['path'], docname=docname, 
+                      jjj=elem['jjj'],
+                      ))
         else:
             raise TopicError(f'{docname}: unknown type "{ty}"')
 

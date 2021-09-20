@@ -4,8 +4,8 @@ from .node import Node
 
 
 class Group(Element):
-    def __init__(self, title, path, docname):
-        super().__init__(title=title, path=path, docname=docname)
+    def __init__(self, title, path, docname, jjj):
+        super().__init__(title=title, path=path, docname=docname, jjj=jjj)
         self._children = {}    # {name: element}
 
     def __str__(self):

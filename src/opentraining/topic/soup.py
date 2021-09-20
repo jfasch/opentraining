@@ -9,6 +9,11 @@ from . import element
 from networkx.algorithms.dag import descendants
 from networkx import DiGraph
 
+from sphinx.deprecation import RemovedInNextVersionWarning
+
+from sphinx.util import logging
+_logger = logging.getLogger(__name__)
+
 
 class Soup:
     def __init__(self):
@@ -30,7 +35,10 @@ class Soup:
         if self._root_group is not None:
             return
 
-        self._root_group = Group(title='Root', path=(), docname='')
+        self._root_group = Group(title='Root', path=(), docname='', 
+                                 jjj=None,   # no associated docutils
+                                             # node
+                                 )
         self._make_hierarchy()
         self._add_nodes_to_groups()
         assert len(self._elements) == 0
@@ -85,9 +93,12 @@ class Soup:
             for target_path in elem.dependencies:
                 try:
                     target_topic = self.element_by_path(target_path)
+                    self._worldgraph.add_edge(elem, target_topic)
                 except errors.PathNotFound:
-                    raise errors.TopicError(f'{elem.docname} ({elem}): dependency {target_path} not found')
-                self._worldgraph.add_edge(elem, target_topic)
+                    # raise errors.TopicError(f'{elem.docname} ({elem}): dependency {target_path} not found')
+                    # warnings.warn(f'{elem.docname} ({elem}): dependency {target_path} not found',
+                    #               RemovedInNextVersionWarning, stacklevel=2)
+                    _logger.warn(f'{elem.docname} ({elem}): dependency {target_path} not found', location=elem.jjj)
 
         return self._worldgraph
 

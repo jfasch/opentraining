@@ -2,11 +2,12 @@ from . import errors
 
 
 class Element:
-    def __init__(self, title, path, docname):
+    def __init__(self, title, path, docname, jjj):
         verify_is_path(path)
 
         self.title = title
         self.docname = docname
+        self.jjj = jjj
         if path:
             self._requested_path = path
         else:   # root group; no parent

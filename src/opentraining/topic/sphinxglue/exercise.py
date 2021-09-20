@@ -21,14 +21,15 @@ def _ev_doctree_read__extract_exercisenodes(app, doctree):
         if len(exercise_nodes) > 1:
             raise errors.TopicError(f'{docname} contains multiple exercises')
 
-        for en in exercise_nodes:
+        for n in exercise_nodes:
             soup.sphinx_add_exercise(
                 app=app, 
                 docname=docname,
                 title=utils.get_document_title(docname, doctree),
-                path=en.path, 
-                dependencies=en.dependencies)
-            en.replace_self([])
+                path=n.path, 
+                jjj=n,
+                dependencies=n.dependencies)
+            n.replace_self([])
     except Exception:
         logger.exception(f'{docname}: cannot extract topic nodes')
         raise

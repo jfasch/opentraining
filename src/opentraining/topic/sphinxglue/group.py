@@ -29,12 +29,14 @@ def _ev_doctree_read__extract_groupnodes(app, doctree):
         if len(group_nodes) > 1:
             raise TopicError(f'{docname} contains multiple groups')
 
-        for gn in group_nodes:
+        for n in group_nodes:
             soup.sphinx_add_group(
                 app=app, 
                 docname=docname, 
                 title=utils.get_document_title(docname, doctree), 
-                path=gn.path)
+                path=n.path,
+                jjj=n,
+            )
     except Exception:
         logger.exception(f'{docname}: cannot extract group nodes')
         raise

@@ -22,19 +22,20 @@ def _ev_doctree_read__extract_tasknodes(app, doctree):
         if len(task_nodes) > 1:
             raise errors.TopicError(f'{docname} contains multiple tasks')
 
-        for tn in task_nodes:
+        for n in task_nodes:
             soup.sphinx_add_task(
                 app=app, 
                 docname=docname,
                 title=utils.get_document_title(docname, doctree),
-                path=tn.path, 
-                dependencies=tn.dependencies,
-                responsible=tn.responsible,
-                initial_estimate=tn.initial_estimate,
-                spent=tn.spent,
-                percent_done=tn.percent_done,
+                path=n.path, 
+                jjj=n,
+                dependencies=n.dependencies,
+                responsible=n.responsible,
+                initial_estimate=n.initial_estimate,
+                spent=n.spent,
+                percent_done=n.percent_done,
             )
-            tn.replace_self([])
+            n.replace_self([])
     except Exception:
         logger.exception(f'{docname}: cannot extract task nodes')
         raise
