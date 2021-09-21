@@ -4,6 +4,7 @@ from .sphinxglue import task
 from .sphinxglue import group
 from .sphinxglue import graph
 from .sphinxglue import soup
+from .sphinxglue import dia
 
 from sphinx.util.docutils import SphinxDirective
 from sphinx.util.nodes import set_source_info
@@ -21,5 +22,6 @@ def setup(app):
     task.setup(app)
     group.setup(app)
     graph.setup(app)
+    dia.setup(app)
 
 

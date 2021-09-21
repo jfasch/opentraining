@@ -32,8 +32,7 @@ setup(
     package_dir = {'': 'src'},
     packages = [
         'opentraining',
-        'opentraining.topic',
-        'opentraining.topic.sphinxglue',
+        'opentraining.sphinxglue',
     ],
     python_requires='>=3.6, <4',
     install_requires=[

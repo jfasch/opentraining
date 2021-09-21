@@ -37,8 +37,7 @@ extensions = [
     'sphinx_rtd_theme',
     'sphinx.ext.graphviz',
 
-    'opentraining.topic',
-    'opentraining.dia',
+    'opentraining',
 ]
 
 exclude_patterns = [

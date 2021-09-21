@@ -50,7 +50,7 @@ def setup(app):
     assert '.dia' not in images.mime_suffixes
     images.mime_suffixes['.dia'] = 'image/x-dia'
 
-#    app.connect('builder-inited', _debug)
+    app.connect('builder-inited', _debug)
     app.add_post_transform(DiaConverter)
 
     return {
