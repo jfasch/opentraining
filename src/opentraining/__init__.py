@@ -6,14 +6,6 @@ from .sphinxglue import graph
 from .sphinxglue import soup
 from .sphinxglue import dia
 
-from sphinx.util.docutils import SphinxDirective
-from sphinx.util.nodes import set_source_info
-from sphinx.util import logging
-from docutils import nodes
-
-
-logger = logging.getLogger(__name__)
-
 def setup(app):
     app.connect('env-purge-doc', soup.sphinx_purge_doc)
 
