@@ -4,8 +4,12 @@ from .node import Node
 
 
 class Group(Element):
-    def __init__(self, title, path, docname, jjj):
-        super().__init__(title=title, path=path, docname=docname, jjj=jjj)
+    def __init__(self, title, path, docname, userdata):
+        super().__init__(
+            title=title, 
+            path=path, 
+            docname=docname, 
+            userdata=userdata)
         self._children = {}    # {name: element}
 
     def __str__(self):
@@ -19,14 +23,14 @@ class Group(Element):
         if len(element._requested_path) == 1: # leaf; add to children
             child = self._children.get(child_name)
             if child:
-                raise errors.TopicError(f'{self}: cannot add "{child_name}"; already exists: {child}')
+                raise errors.OpenTrainingError(f'{self}: cannot add "{child_name}"; already exists: {child}')
             self._children[child_name] = element
             del element._requested_path
             element.parent = self
         else:
             parent = self._children.get(child_name)
             if parent is None:
-                raise errors.TopicError(f'{self}: cannot add "{element._requested_path}": '
+                raise errors.OpenTrainingError(f'{self}: cannot add "{element._requested_path}": '
                                         f'intermediate "{child_name}" does not exist')
             element._requested_path = element._requested_path[1:]
             parent.add_element(element)
@@ -36,32 +40,30 @@ class Group(Element):
 
         element = self._children.get(path[0])
         if element is None:
-            raise errors.PathNotFound(f'{self}: no element with name "{path[0]}"')
+            raise errors.PathNotFound(f'{self}: no element with name "{path[0]}"', element=element)
         if len(path) == 1:
             return element
-        try:
-            return element.element_by_path(path[1:])
-        except errors.PathNotFound:
-            raise errors.PathNotFound(f'{self}: no element with name "{path[0]}"')
+
+        return element.element_by_path(path[1:])
 
     def child_by_name(self, name):
         '''Get direct child element by name.'''
         child = self._children.get(name)
         if child is None:
-            raise errors.TopicError(f'{self}: no child with name {name}')
+            raise errors.OpenTrainingError(f'{self}: no child with name {name}')
         return child
 
     def element_name(self, element):
         '''Get name of element under which it is know to his group.
 
-        Raises TopicError if element not there.
+        Raises OpenTrainingError if element not there.
 
         '''
         for name, elem in self._children.items():
             if elem is element:
                 return name
         else:
-            raise errors.TopicError(f'{element} is not a child of {self}')
+            raise errors.OpenTrainingError(f'{element} is not a child of {self}')
 
     def has_element(self, element):
         '''Does this group have the element?'''

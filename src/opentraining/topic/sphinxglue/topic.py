@@ -2,6 +2,7 @@ from . import utils
 from . import soup
 from .graph import TopicGraphNode
 from .. import errors
+from ..topic import Topic
 
 from sphinx.util.docutils import SphinxDirective
 from sphinx.util.nodes import set_source_info
@@ -20,17 +21,16 @@ def _ev_doctree_read__extract_topicnodes(app, doctree):
         docname = app.env.docname
         topic_nodes = list(doctree.traverse(_TopicNode))
         if len(topic_nodes) > 1:
-            raise errors.TopicError(f'{docname} contains multiple topics')
+            raise errors.OpenTrainingError(f'{docname} contains multiple topics')
 
         for n in topic_nodes:
-            soup.sphinx_add_topic(
-                app=app, 
-                docname=docname,
+            soup.sphinx_add_element(app, Topic(
                 title=utils.get_document_title(docname, doctree),
                 path=n.path, 
-                jjj=n,
+                docname=docname,
+                userdata=n,
                 dependencies=n.dependencies,
-            )
+            ))
             n.replace_self([])
     except Exception:
         logger.exception(f'{docname}: cannot extract topic nodes')

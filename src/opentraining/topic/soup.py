@@ -1,3 +1,4 @@
+from .element import Element
 from .group import Group
 from .node import Node
 from .topic import Topic
@@ -8,11 +9,6 @@ from . import element
 
 from networkx.algorithms.dag import descendants
 from networkx import DiGraph
-
-from sphinx.deprecation import RemovedInNextVersionWarning
-
-from sphinx.util import logging
-_logger = logging.getLogger(__name__)
 
 
 class Soup:
@@ -26,23 +22,28 @@ class Soup:
         return len(list(self._root_group.iter_recursive()))
 
     def add_element(self, element):
+        assert isinstance(element, Element)
         self._assert_uncommitted()
         if self._worldgraph:
-            raise errors.TopicError(f'cannot add {element}: graph already made')
+            raise errors.OpenTrainingError(f'cannot add {element}: graph already made')
         self._elements.add(element)
 
     def commit(self):
         if self._root_group is not None:
             return
 
-        self._root_group = Group(title='Root', path=(), docname='', 
-                                 jjj=None,   # no associated docutils
-                                             # node
-                                 )
+        self._root_group = Group(
+            title='Root', 
+            path=(), 
+            docname='', 
+            userdata=None,   # no associated docutils node
+        )
         self._make_hierarchy()
         self._add_nodes_to_groups()
-        assert len(self._elements) == 0
+        assert len(self._elements) == 0, self._elements
         del self._elements
+        self.worldgraph()    # only to detect missing dependencies
+                             # early
 
     @property
     def root(self):
@@ -63,20 +64,15 @@ class Soup:
         be mixed)
         '''
 
+        # paranoia
+        for e in entrypoints:
+            assert isinstance(e, Element)
+
         self._assert_committed()
         world = self._make_worldgraph()
 
-        entrypoint_elems = set()
-        for e in entrypoints:
-            try:
-                element.verify_is_path(e)
-            except errors.TopicError:   # not a path; must be element
-                entrypoint_elems.add(e)
-            else:
-                entrypoint_elems.add(self.element_by_path(e))
-
         topics = set()
-        for topic in entrypoint_elems:
+        for topic in entrypoints:
             topics.add(topic)
             topics.update(descendants(world, topic))
         return world.subgraph(topics)
@@ -85,6 +81,7 @@ class Soup:
         if self._worldgraph is not None:
             return self._worldgraph
 
+        collected_errors = []
         self._worldgraph = DiGraph()
         for name, elem in self._root_group.iter_recursive():
             if not isinstance(elem, Node):
@@ -94,12 +91,14 @@ class Soup:
                 try:
                     target_topic = self.element_by_path(target_path)
                     self._worldgraph.add_edge(elem, target_topic)
-                except errors.PathNotFound:
-                    # raise errors.TopicError(f'{elem.docname} ({elem}): dependency {target_path} not found')
-                    # warnings.warn(f'{elem.docname} ({elem}): dependency {target_path} not found',
-                    #               RemovedInNextVersionWarning, stacklevel=2)
-                    _logger.warn(f'{elem.docname} ({elem}): dependency {target_path} not found', location=elem.jjj)
+                except errors.PathNotFound as e:
+                    collected_errors.append(
+                        errors.DependencyError(
+                            f'{elem.docname} ({elem}): dependency {target_path} not found', 
+                            element=elem))
 
+        if len(collected_errors) != 0:
+            raise errors.CompoundError('cannot build world graph', errors=collected_errors)
         return self._worldgraph
 
     def _make_hierarchy(self):

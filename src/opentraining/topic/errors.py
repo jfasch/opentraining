@@ -1,17 +1,32 @@
-from sphinx.errors import SphinxError
+class OpenTrainingError(Exception):
+    '''Base class for all OpenTraining errors'''
 
-
-class TopicError(SphinxError):
-    category = 'Topic error'
-
-class BadPath(TopicError):
+class BadPath(OpenTrainingError):
     pass
 
-class PathNotFound(TopicError):
+class ElementError(OpenTrainingError):
+    '''Base class for errors tied to a single element'''
+    def __init__(self, msg, element):
+        super().__init__(msg)
+        self.element = element
+
+class DependencyError(ElementError):
     pass
 
-class NotCommitted(TopicError):
+class PathNotFound(ElementError):
     pass
 
-class AlreadyCommitted(TopicError):
+class NotCommitted(ElementError):
     pass
+
+class AlreadyCommitted(ElementError):
+    pass
+
+class CompoundError(OpenTrainingError):
+    '''An error that *contains* multiple errors. Used in situations where
+    we do not bail out early, but rather continue, and represent the
+    user with a list of collected error messages.  '''
+
+    def __init__(self, msg, errors):
+        super().__init__(msg)
+        self.errors = errors

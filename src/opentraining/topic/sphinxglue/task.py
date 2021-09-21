@@ -2,6 +2,7 @@ from . import utils
 from . import soup
 from .graph import TopicGraphNode
 from .. import errors
+from ..task import Task
 
 from sphinx.util.docutils import SphinxDirective
 from sphinx.util.nodes import set_source_info
@@ -20,21 +21,20 @@ def _ev_doctree_read__extract_tasknodes(app, doctree):
         docname = app.env.docname
         task_nodes = list(doctree.traverse(_TaskNode))
         if len(task_nodes) > 1:
-            raise errors.TopicError(f'{docname} contains multiple tasks')
+            raise errors.OpenTrainingError(f'{docname} contains multiple tasks')
 
         for n in task_nodes:
-            soup.sphinx_add_task(
-                app=app, 
+            soup.sphinx_add_element(app, Task(
                 docname=docname,
                 title=utils.get_document_title(docname, doctree),
                 path=n.path, 
-                jjj=n,
+                userdata=n,
                 dependencies=n.dependencies,
                 responsible=n.responsible,
                 initial_estimate=n.initial_estimate,
                 spent=n.spent,
                 percent_done=n.percent_done,
-            )
+            ))
             n.replace_self([])
     except Exception:
         logger.exception(f'{docname}: cannot extract task nodes')
@@ -80,11 +80,4 @@ class _TaskDirective(SphinxDirective):
         task.document = self.state.document
         set_source_info(self, task)
 
-        # graph = TopicGraphNode(entries=[path])
-        # graph.document = self.state.document
-        # set_source_info(self, graph)
-
-        return [task
-                # , graph
-                ]
-
+        return [task]

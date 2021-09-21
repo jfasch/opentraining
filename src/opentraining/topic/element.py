@@ -2,12 +2,12 @@ from . import errors
 
 
 class Element:
-    def __init__(self, title, path, docname, jjj):
-        verify_is_path(path)
+    def __init__(self, title, path, docname, userdata):
+        _verify_is_path(path)
 
         self.title = title
         self.docname = docname
-        self.jjj = jjj
+        self.userdata = userdata
         if path:
             self._requested_path = path
         else:   # root group; no parent
@@ -22,14 +22,14 @@ class Element:
     @property
     def path(self):
         if hasattr(self, '_requested_path'):
-            raise errors.TopicError(f'{self} is not yet committed (path not known)')
+            raise errors.OpenTrainingError(f'{self} is not yet committed (path not known)')
         if self.parent:
             return self.parent.path + [self.parent.element_name(self)]
         else:
             return []
 
 
-def verify_is_path(path):
+def _verify_is_path(path):
     if type(path) not in (list, tuple):
         raise errors.BadPath(f'Not a valid path: {path} is neither list nor tuple')
         

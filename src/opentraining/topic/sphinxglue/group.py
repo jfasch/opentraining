@@ -2,7 +2,8 @@ from . import utils
 from . import soup
 from .. import errors
 from ..topic import Topic
-from ..errors import TopicError
+from ..group import Group
+from ..errors import OpenTrainingError
 
 from sphinx.util.docutils import SphinxDirective
 from sphinx.util.nodes import set_source_info
@@ -27,16 +28,15 @@ def _ev_doctree_read__extract_groupnodes(app, doctree):
         docname = app.env.docname
         group_nodes = list(doctree.traverse(_GroupNode))
         if len(group_nodes) > 1:
-            raise TopicError(f'{docname} contains multiple groups')
+            raise OpenTrainingError(f'{docname} contains multiple groups')
 
         for n in group_nodes:
-            soup.sphinx_add_group(
-                app=app, 
+            soup.sphinx_add_element(app, Group(
                 docname=docname, 
                 title=utils.get_document_title(docname, doctree), 
                 path=n.path,
-                jjj=n,
-            )
+                userdata=n,
+            ))
     except Exception:
         logger.exception(f'{docname}: cannot extract group nodes')
         raise

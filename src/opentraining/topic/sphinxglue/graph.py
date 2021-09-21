@@ -241,7 +241,7 @@ class _TopicGraphExpander:
                 ['dot', '-v', '-T', 'svg'],
                 input=dot, check=True, text=True, capture_output=True)
         except subprocess.CalledProcessError as e:
-            raise errors.TopicError(f'dot exited with status {e.returncode}:\n[dot]\n{dot}\n[stderr]\n{e.stderr}')
+            raise errors.OpenTrainingError(f'dot exited with status {e.returncode}:\n[dot]\n{dot}\n[stderr]\n{e.stderr}')
     
         svg = completed.stdout
         # strip XML declaration (we are embedding it)

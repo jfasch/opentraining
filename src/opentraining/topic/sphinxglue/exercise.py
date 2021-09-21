@@ -1,6 +1,7 @@
 from . import utils
 from . import soup
 from .. import errors
+from ..exercise import Exercise
 
 from sphinx.util.docutils import SphinxDirective
 from sphinx.util.nodes import set_source_info
@@ -19,16 +20,16 @@ def _ev_doctree_read__extract_exercisenodes(app, doctree):
         docname = app.env.docname
         exercise_nodes = list(doctree.traverse(_ExerciseNode))
         if len(exercise_nodes) > 1:
-            raise errors.TopicError(f'{docname} contains multiple exercises')
+            raise errors.OpenTrainingError(f'{docname} contains multiple exercises')
 
         for n in exercise_nodes:
-            soup.sphinx_add_exercise(
-                app=app, 
-                docname=docname,
+            soup.sphinx_add_element(app, Exercise(
                 title=utils.get_document_title(docname, doctree),
+                docname=docname,
                 path=n.path, 
-                jjj=n,
-                dependencies=n.dependencies)
+                userdata=n,
+                dependencies=n.dependencies,
+            ))
             n.replace_self([])
     except Exception:
         logger.exception(f'{docname}: cannot extract topic nodes')

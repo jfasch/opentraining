@@ -3,70 +3,21 @@ from ..topic import Topic
 from ..exercise import Exercise
 from ..task import Task
 from ..group import Group
-from ..errors import TopicError
+from .. import errors
 
-import logging
-logger = logging.getLogger(__name__)
+from sphinx.util import logging
+_logger = logging.getLogger(__name__)
 
-def sphinx_add_topic(app, docname, title, path, jjj, dependencies):
+
+def _prepare_app(app):
     if hasattr(app, 'ot_soup'):
-        raise TopicError('Soup already created, cannot add one more topic')
+        raise OpenTrainingError('Soup already created, cannot add one more element')
     if not hasattr(app.env, 'ot_elements'):
         app.env.ot_elements = {}
 
-    app.env.ot_elements[docname] = {
-        'type': 'topic',
-        'title': title,
-        'path': path,
-        'jjj': jjj,
-        'dependencies': dependencies,
-    }
-
-def sphinx_add_exercise(app, docname, title, path, jjj, dependencies):
-    if hasattr(app, 'ot_soup'):
-        raise TopicError('Soup already created, cannot add one more topic')
-    if not hasattr(app.env, 'ot_elements'):
-        app.env.ot_elements = {}
-
-    app.env.ot_elements[docname] = {
-        'type': 'exercise',
-        'title': title,
-        'path': path,
-        'jjj': jjj,
-        'dependencies': dependencies,
-    }
-
-def sphinx_add_task(app, docname, title, path, jjj, dependencies, 
-                    responsible, initial_estimate, spent, percent_done):
-    if hasattr(app, 'ot_soup'):
-        raise TopicError('Soup already created, cannot add one more topic')
-    if not hasattr(app.env, 'ot_elements'):
-        app.env.ot_elements = {}
-
-    app.env.ot_elements[docname] = {
-        'type': 'task',
-        'title': title,
-        'path': path,
-        'jjj': jjj,
-        'dependencies': dependencies,
-        'responsible': responsible,
-        'initial_estimate': initial_estimate,
-        'spent': spent,
-        'percent_done': percent_done,
-    }
-
-def sphinx_add_group(app, docname, title, path, jjj):
-    if hasattr(app, 'ot_soup'):
-        raise TopicError('Soup already created, cannot add one more group')
-    if not hasattr(app.env, 'ot_elements'):
-        app.env.ot_elements = {}
-
-    app.env.ot_elements[docname] = {
-        'type': 'group',
-        'title': title,
-        'path': path,
-        'jjj': jjj,
-    }
+def sphinx_add_element(app, element):
+    _prepare_app(app)
+    app.env.ot_elements[element.docname] = element
 
 def sphinx_purge_doc(app, env, docname):
     if hasattr(env, 'ot_elements'):
@@ -77,38 +28,15 @@ def sphinx_create_soup(app):
         return
 
     app.ot_soup = Soup()
-    for docname, elem in app.env.ot_elements.items():
-        ty = elem['type']
-        if ty == 'topic':
-            app.ot_soup.add_element(
-                Topic(title=elem['title'], path=elem['path'], docname=docname,
-                      dependencies=elem['dependencies'], 
-                      jjj=elem['jjj'],
-            ))
-        elif ty == 'exercise':
-            app.ot_soup.add_element(
-                Exercise(title=elem['title'], path=elem['path'], docname=docname,
-                         dependencies=elem['dependencies'],
-                         jjj=elem['jjj'],
-                         ))
-        elif ty == 'task':
-            app.ot_soup.add_element(
-                Task(title=elem['title'],
-                     path=elem['path'],
-                     docname=docname,
-                     dependencies=elem['dependencies'],
-                     jjj=elem['jjj'],
-                     responsible=elem['responsible'],
-                     initial_estimate=elem['initial_estimate'],
-                     spent=elem['spent'],
-                     percent_done=elem['percent_done'],
-                ))
-        elif ty == 'group':
-            app.ot_soup.add_element(
-                Group(title=elem['title'], path=elem['path'], docname=docname, 
-                      jjj=elem['jjj'],
-                      ))
-        else:
-            raise TopicError(f'{docname}: unknown type "{ty}"')
+    for element in app.env.ot_elements.values():
+        app.ot_soup.add_element(element)
 
-    app.ot_soup.commit()
+    try:
+        app.ot_soup.commit()
+    except errors.CompoundError as e:
+        for err in e.errors:
+            if isinstance(err, errors.ElementError):
+                _logger.warning(str(err), location=err.element.userdata)
+            else:
+                assert False, f'hm. cannot handle {err}'
+            
