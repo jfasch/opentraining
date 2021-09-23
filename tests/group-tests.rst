@@ -10,4 +10,5 @@ Tests
    exercise-simple
    task-simple
    dependency-error/group
+   group/group
    graph
