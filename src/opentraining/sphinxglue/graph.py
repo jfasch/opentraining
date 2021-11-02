@@ -18,36 +18,37 @@ logger = logging.getLogger(__name__)
 
 
 def setup(app):
-    app.add_directive('ot-graph', _TopicGraphDirective)
+    app.add_directive('ot-graph', _GraphDirective)
     app.connect('doctree-resolved', _ev_doctree_resolved__expand_topicgraph_nodes)
 
 def _ev_doctree_resolved__expand_topicgraph_nodes(app, doctree, docname):
     '''"doctree-resolved" event handler to expand topic graph nodes'''
     try:
         soup.sphinx_create_soup(app)
-        expander = _TopicGraphExpander(app=app, docname=docname)
-        for n in doctree.traverse(TopicGraphNode):
+        expander = _GraphExpander(app=app, docname=docname)
+        for n in doctree.traverse(_GraphNode):
             expander.expand(n)
     except Exception:
-        logger.exception(f'{docname}: cannot expand topic graph')
-        raise
+        logger.warning(f'{docname}: cannot expand topic graph', location=err.element.userdata)
+        # logger.exception(f'{docname}: cannot expand topic graph')
+        # raise
 
-class TopicGraphNode(nodes.Element):
+class _GraphNode(nodes.Element):
     def __init__(self, entries):
         super().__init__(self)
         self.entries = entries
 
-class _TopicGraphDirective(SphinxDirective):
+class _GraphDirective(SphinxDirective):
     option_spec = {
         'entries': utils.list_of_element_path,
     }
     def run(self):
-        node = TopicGraphNode(entries=self.options.get('entries', []))
+        node = _GraphNode(entries=self.options.get('entries', []))
         node.document = self.state.document
         set_source_info(self, node)
         return [node]
 
-class _TopicGraphExpander:
+class _GraphExpander:
     def __init__(self, app, docname):
         self._app = app
         self._docname = docname
@@ -59,7 +60,7 @@ class _TopicGraphExpander:
         node.replace_self(nodes.raw(svg, svg, format='html'))
 
     def _graphnode_to_graph(self, node):
-        assert isinstance(node, TopicGraphNode)
+        assert isinstance(node, _GraphNode)
 
         worldgraph = self._app.ot_soup.worldgraph()
         if len(node.entries) == 0:
@@ -208,8 +209,11 @@ class _TopicGraphExpander:
             label = '{'
             label += node.title
             label += '|'
-            label += f'responsible {node.responsible}'
-            label += '|'
+
+            if len(node.responsible):
+                label += f'responsible {node.responsible}'
+                label += '|'
+
             label += '{'
             label += f'{node.percent_done}% done'
             label += '|'

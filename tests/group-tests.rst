@@ -11,4 +11,5 @@ Tests
    task-simple
    dependency-error/group
    group/group
+   project-management/group
    graph

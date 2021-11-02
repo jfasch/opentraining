@@ -1,6 +1,5 @@
 from . import utils
 from . import soup
-from .graph import TopicGraphNode
 from .. import errors
 from ..task import Task
 

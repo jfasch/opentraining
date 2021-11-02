@@ -18,7 +18,6 @@ logger = logging.getLogger(__name__)
 def setup(app):
     app.add_directive('ot-group', _GroupDirective)
     app.connect('doctree-read', _ev_doctree_read__extract_groupnodes)
-    app.connect('doctree-resolved', _ev_doctree_resolved__expand_group_nodes)
 
 def _ev_doctree_read__extract_groupnodes(app, doctree):
     '''Add group metadata to soup. Leave group node intact; it is expanded
@@ -37,18 +36,9 @@ def _ev_doctree_read__extract_groupnodes(app, doctree):
                 path=n.path,
                 userdata=n,
             ))
+            n.replace_self([])
     except Exception:
         logger.exception(f'{docname}: cannot extract group nodes')
-        raise
-
-def _ev_doctree_resolved__expand_group_nodes(app, doctree, docname):
-    try:
-        soup.sphinx_create_soup(app)
-        expander = _GroupTopicListExpander(app=app, docname=docname)
-        for n in doctree.traverse(_GroupNode):
-            expander.expand(n)
-    except Exception:
-        logger.exception(f'{docname}: cannot expand group')
         raise
 
 class _GroupNode(nodes.Element):
@@ -68,43 +58,3 @@ class _GroupDirective(SphinxDirective):
 
         return [group]
 
-class _GroupTopicListExpander:
-    def __init__(self, app, docname):
-        self._app = app
-        self._docname = docname
-
-    def expand(self, node):
-        group = self._app.ot_soup.element_by_path(node.path)
-        topics = (t for _,t in group.iter_recursive() if isinstance(t, Topic))
-        graph = self._app.ot_soup.worldgraph().subgraph(topics)
-        topo = topological_sort(graph)
-
-        bl = nodes.bullet_list()
-        for topic in reversed(list(topo)):
-            if not isinstance(topic, Topic):
-                continue
-            li = nodes.list_item()
-            li += self._topic_paragraph(topic.path)
-            bl += li
-        node.replace_self(bl)
-
-    def _topic_paragraph(self, path):
-        topic = self._app.ot_soup.element_by_path(path)
-        assert isinstance(topic, Topic), f'dependency on non-topic {path}?'
-        p = nodes.paragraph()
-        p += self._topic_headline_elems(path)
-        return p
-
-    def _topic_headline_elems(self, path):
-        topic = self._app.ot_soup.element_by_path(path)
-        elems = []
-        elems.append(nodes.Text(f'{topic.title} ('))
-
-        ref = nodes.reference()
-        ref['refuri'] = self._app.builder.get_relative_uri(
-            from_=self._docname, to=topic.docname)
-        ref += nodes.Text('.'.join(topic.path))
-        elems.append(ref)
-        elems.append(nodes.Text(')'))
-        
-        return elems
