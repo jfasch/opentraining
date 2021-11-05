@@ -46,7 +46,7 @@ class _ExerciseDirective(SphinxDirective):
     required_arguments = 1   # path
 
     option_spec = {
-        'dependencies': utils.list_of_element_path,
+        'dependencies': utils.list_of_elementpath,
     }
 
     def run(self):

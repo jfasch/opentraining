@@ -40,7 +40,7 @@ class _GraphNode(nodes.Element):
 
 class _GraphDirective(SphinxDirective):
     option_spec = {
-        'entries': utils.list_of_element_path,
+        'entries': utils.list_of_elementpath,
     }
     def run(self):
         node = _GraphNode(entries=self.options.get('entries', []))

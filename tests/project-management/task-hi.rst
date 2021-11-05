@@ -7,4 +7,9 @@
 Hi Task
 =======
 
+Task Metadata
+-------------
+
+``ot-taskmeta``
+
 .. ot-taskmeta:: opentraining.tests.project_management.task_hi
