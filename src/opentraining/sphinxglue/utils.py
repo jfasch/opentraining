@@ -17,4 +17,3 @@ def get_document_title(docname, doctree):
         return title.astext()
     else:
         raise Exception(f'{docname}: first <section> has no <title>')
-

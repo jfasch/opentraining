@@ -1,4 +1,5 @@
 from ..soup import Soup
+from ..element import Element
 from ..topic import Topic
 from ..exercise import Exercise
 from ..task import Task
@@ -17,6 +18,7 @@ def _prepare_app(app):
 
 def sphinx_add_element(app, element):
     _prepare_app(app)
+    assert isinstance(element, Element)
     app.env.ot_elements[element.docname] = element
 
 def sphinx_purge_doc(app, env, docname):

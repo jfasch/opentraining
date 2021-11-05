@@ -10,6 +10,9 @@ Project Management
 
    task-hi
    task-lo
+   person-a
+   person-b
+   person-c
 
 Dependencies
 ------------

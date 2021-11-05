@@ -2,7 +2,10 @@ from .node import Node
 
 
 class Task(Node):
-    def __init__(self, title, path, docname, dependencies, userdata,
+    def __init__(self, 
+                 title, path, docname, 
+                 dependencies, userdata,
+                 implementation_points, documentation_points, integration_points,
                  responsible, initial_estimate, spent, percent_done):
         super().__init__(
             title=title, 
@@ -10,6 +13,10 @@ class Task(Node):
             docname=docname, 
             dependencies=dependencies, 
             userdata=userdata)
+        self.implementation_points = implementation_points
+        self.documentation_points = documentation_points
+        self.integration_points = integration_points
+
         self.initial_estimate = float(initial_estimate)
         self.spent = float(spent)
         self.percent_done = float(percent_done)

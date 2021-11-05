@@ -24,11 +24,16 @@ def _ev_doctree_read__extract_tasknodes(app, doctree):
 
         for n in task_nodes:
             soup.sphinx_add_element(app, Task(
-                docname=docname,
                 title=utils.get_document_title(docname, doctree),
+                docname=docname,
                 path=n.path, 
-                userdata=n,
                 dependencies=n.dependencies,
+                userdata=n,
+
+                implementation_points=n.implementation_points,
+                documentation_points=n.documentation_points,
+                integration_points=n.integration_points,
+
                 responsible=n.responsible,
                 initial_estimate=n.initial_estimate,
                 spent=n.spent,
@@ -41,10 +46,16 @@ def _ev_doctree_read__extract_tasknodes(app, doctree):
         
 class _TaskNode(nodes.Element):
     def __init__(self, path, dependencies,
+                 implementation_points, documentation_points, integration_points,
                  responsible, initial_estimate, spent, percent_done):
         super().__init__(self)
         self.title = None
         self.path = path
+
+        self.implementation_points = implementation_points
+        self.documentation_points = documentation_points
+        self.integration_points = integration_points
+
         self.dependencies = dependencies
         self.responsible = responsible
         self.initial_estimate = initial_estimate
@@ -55,6 +66,9 @@ class _TaskDirective(SphinxDirective):
     required_arguments = 1   # path
 
     option_spec = {
+        'implementation-points': int,
+        'documentation-points': int,
+        'integration-points': int,
         'dependencies': utils.list_of_element_path,
         'responsible': str,
         'initial-estimate': int,
@@ -65,12 +79,20 @@ class _TaskDirective(SphinxDirective):
     def run(self):
         path = utils.element_path(self.arguments[0].strip())
         dependencies = self.options.get('dependencies', [])
+        implementation_points = self.options.get('implementation-points')
+        documentation_points = self.options.get('documentation-points')
+        integration_points = self.options.get('integration-points')
         responsible = self.options.get('responsible', '')
         initial_estimate = self.options.get('initial-estimate', 0)
         spent = self.options.get('spent', 0)
         percent_done = self.options.get('percent-done', 0)
 
         task = _TaskNode(path=path, 
+
+                         implementation_points=implementation_points,
+                         documentation_points=documentation_points,
+                         integration_points=integration_points,
+
                          dependencies=dependencies,
                          responsible=responsible,
                          initial_estimate=initial_estimate, 

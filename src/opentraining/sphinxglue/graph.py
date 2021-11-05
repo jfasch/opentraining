@@ -4,6 +4,7 @@ from .. import errors
 from ..topic import Topic
 from ..exercise import Exercise
 from ..task import Task
+from ..person import Person
 from ..node import Node
 from ..group import Group
 
@@ -14,7 +15,7 @@ from docutils import nodes
 
 import subprocess
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 def setup(app):
@@ -28,10 +29,9 @@ def _ev_doctree_resolved__expand_topicgraph_nodes(app, doctree, docname):
         expander = _GraphExpander(app=app, docname=docname)
         for n in doctree.traverse(_GraphNode):
             expander.expand(n)
-    except Exception:
-        logger.warning(f'{docname}: cannot expand topic graph', location=err.element.userdata)
-        # logger.exception(f'{docname}: cannot expand topic graph')
-        # raise
+    except Exception as err:
+        _logger.warning(f'{docname}: cannot expand topic graph', location=err.element.userdata)
+
 
 class _GraphNode(nodes.Element):
     def __init__(self, entries):
@@ -231,6 +231,26 @@ class _GraphExpander:
                 '    style=filled;',
                 f'    penwidth="{border}"',
                 f'    fillcolor="{self._percent_to_rgb(node.percent_done)}";'
+                '];',
+            ]
+
+        elif isinstance(node, Person):
+            label = '{'
+            label += node.title
+            label += '|'
+            label += f'Firstname: {node.firstname}'
+            label += '|'
+            label += f'Lastname: {node.lastname}'
+
+            label += '}'
+
+            return [
+                f'{node_id} [',
+                f'    label="{label}";',
+                f'    href="{uri}";',
+                '    shape=Mrecord;',
+                '    style=filled;',
+                f'    penwidth="{border}";'
                 '];',
             ]
 
