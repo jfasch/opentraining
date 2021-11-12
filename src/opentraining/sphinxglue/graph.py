@@ -32,7 +32,6 @@ def _ev_doctree_resolved__expand_topicgraph_nodes(app, doctree, docname):
     except Exception as err:
         _logger.warning(f'{docname}: cannot expand topic graph', location=err.element.userdata)
 
-
 class _GraphNode(nodes.Element):
     def __init__(self, entries):
         super().__init__(self)
@@ -208,19 +207,6 @@ class _GraphExpander:
         elif isinstance(node, Task):
             label = '{'
             label += node.title
-            label += '|'
-
-            if len(node.responsible):
-                label += f'responsible {node.responsible}'
-                label += '|'
-
-            label += '{'
-            label += f'{node.percent_done}% done'
-            label += '|'
-            label += f'initial {node.initial_estimate}h'
-            label += '|'
-            label += f'spent {node.spent}h'
-            label += '}'
             label += '}'
 
             return [
@@ -230,7 +216,7 @@ class _GraphExpander:
                 '    shape=Mrecord;',
                 '    style=filled;',
                 f'    penwidth="{border}"',
-                f'    fillcolor="{self._percent_to_rgb(node.percent_done)}";'
+#                f'    fillcolor="{self._percent_to_rgb(node.percent_done)}";'
                 '];',
             ]
 

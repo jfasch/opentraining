@@ -3,6 +3,7 @@ from .sphinxglue import exercise
 from .sphinxglue import task
 from .sphinxglue import taskmeta
 from .sphinxglue import person
+from .sphinxglue import grading
 from .sphinxglue import group
 from .sphinxglue import grouplist
 from .sphinxglue import graph
@@ -17,6 +18,7 @@ def setup(app):
     task.setup(app)
     taskmeta.setup(app)
     person.setup(app)
+    grading.setup(app)
     group.setup(app)
     grouplist.setup(app)
     graph.setup(app)

@@ -32,6 +32,9 @@ class Soup:
         if self._root_group is not None:
             return
 
+        elements_to_resolve = list(self._elements)
+
+        # build up hierarchy (thereby emptying self._elements)
         self._root_group = Group(
             title='Root', 
             path=(), 
@@ -41,6 +44,14 @@ class Soup:
         self._make_hierarchy()
         self._add_nodes_to_groups()
         assert len(self._elements) == 0, self._elements
+
+        # once the elements have paths in their final hierarchy, we
+        # can let them resolve their own stuff. for example, a task
+        # initially refers to a person's *path* - final situation
+        # should be though that a task refers to the person directly.
+        for element in elements_to_resolve:
+            element.resolve_paths(self)
+
         del self._elements
         self.worldgraph()    # only to detect missing dependencies
                              # early

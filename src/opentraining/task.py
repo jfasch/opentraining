@@ -8,18 +8,21 @@ class Task(Node):
 
                  implementation_points, implementors,
                  documentation_points, documenters,
-                 integration_points, integrators,
+                 integration_points, integrators):
 
-                 responsible, initial_estimate, spent, percent_done):
-
-        # add persons as task dependencies
-        person_dependencies = [person for person, share in implementors + documenters + integrators]
+        if len(implementors) != 0:
+            assert sum(share for person, share in implementors) == 100
+        if len(documenters) != 0:
+            assert sum(share for person, share in documenters) == 100
+        if len(integrators) != 0:
+            assert sum(share for person, share in integrators) == 100
 
         super().__init__(
             title=title, 
             path=path, 
             docname=docname, 
-            dependencies=dependencies + person_dependencies, 
+            # add persons as task dependencies
+            dependencies=dependencies + [person for person, share in implementors + documenters + integrators], 
             userdata=userdata)
 
         self.implementation_points = implementation_points
@@ -30,10 +33,23 @@ class Task(Node):
         self.documenters = documenters
         self.integrators = integrators
 
-        self.initial_estimate = float(initial_estimate)
-        self.spent = float(spent)
-        self.percent_done = float(percent_done)
-        self.responsible = responsible
-
     def __str__(self):
         return 'Task:'+super().__str__()
+
+    def resolve_paths(self, soup):
+        resolved_implementors = []
+        for person_path, share in self.implementors:
+            person = soup.element_by_path(person_path)
+            resolved_implementors.append((person, share))
+        resolved_documenters = []
+        for person_path, share in self.documenters:
+            person = soup.element_by_path(person_path)
+            resolved_documenters.append((person, share))
+        resolved_integrators = []
+        for person_path, share in self.integrators:
+            person = soup.element_by_path(person_path)
+            resolved_integrators.append((person, share))
+
+        self.implementors = resolved_implementors
+        self.documenters = resolved_documenters
+        self.integrators = resolved_integrators

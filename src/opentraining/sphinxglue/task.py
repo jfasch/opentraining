@@ -36,11 +36,6 @@ def _ev_doctree_read__extract_tasknodes(app, doctree):
                 implementors = n.implementors,
                 documenters = n.documenters,
                 integrators = n.integrators,
-
-                responsible = n.responsible,
-                initial_estimate = n.initial_estimate,
-                spent = n.spent,
-                percent_done = n.percent_done,
             ))
             n.replace_self([])
     except Exception:
