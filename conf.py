@@ -53,3 +53,5 @@ html_theme_options = {
     'collapse_navigation': False,
     'navigation_depth': -1,
 }
+
+graphviz_output_format = 'svg'

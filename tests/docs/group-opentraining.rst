@@ -1,5 +1,5 @@
-OpenTraining
-============
+Visual Output Testcases
+=======================
 
 .. toctree::
 

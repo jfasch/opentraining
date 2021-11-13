@@ -1,4 +1,4 @@
-from . import utils
+  from . import utils
 from . import soup
 from .. import errors
 from ..topic import Topic
@@ -14,6 +14,7 @@ from sphinx.util import logging
 from docutils import nodes
 
 import subprocess
+import re
 
 _logger = logging.getLogger(__name__)
 
@@ -177,7 +178,7 @@ class _GraphExpander:
         assert False, f'invalid percentage: {percent}'
 
     def _dot_node_lines(self, node, hilit):
-        uri = self._app.builder.get_relative_uri(from_=self._docname, to=node.docname)
+        uri = self._app.builder.get_target_uri(node.docname)
         node_id = '_'.join(node.path)
 
         border = 1
@@ -245,6 +246,7 @@ class _GraphExpander:
         dst_id = '_'.join(dst.path)
         return [f'{src_id} -> {dst_id};']
 
+    _re_width = re.compile(r'width\s*=\s*".*"')
     def _dot_to_svg(self, dot):
         try:
             completed = subprocess.run(
@@ -256,6 +258,14 @@ class _GraphExpander:
         svg = completed.stdout
         # strip XML declaration (we are embedding it)
         svg = svg[svg.index('<svg'):]
+
+        if True:
+            # patch "width" out (we want it scaled to fit the page)
+            width = self._re_width.search(svg)
+             # hm. if not there, dot has changed, apparently. fix that.
+            assert width is not None
+            svg = svg[:width.start()] + svg[width.end():]
+
         return svg
 
     def _dot_id_from_path(self,  path):

@@ -3,4 +3,4 @@ OpenTraining
 
 .. toctree::
 
-   tests/docs/group-opentraining
+   tests/docs/index
