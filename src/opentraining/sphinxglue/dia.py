@@ -60,5 +60,5 @@ def setup(app):
     }
 
 def _debug(app):
-    print('DEBUG', app.builder.supported_image_types)
+    # print('DEBUG', app.builder.supported_image_types)
     pass
