@@ -46,10 +46,11 @@ class _TaskNode(nodes.Element):
     def __init__(self, path, dependencies,
                  implementation_points, documentation_points, integration_points,
                  implementors, documenters, integrators,
-                 responsible, initial_estimate, spent, percent_done):
+                ):
         super().__init__(self)
         self.title = None
         self.path = path
+        self.dependencies = dependencies
 
         self.implementation_points = implementation_points
         self.documentation_points = documentation_points
@@ -58,27 +59,17 @@ class _TaskNode(nodes.Element):
         self.documenters = documenters
         self.integrators = integrators
 
-        self.dependencies = dependencies
-        self.responsible = responsible
-        self.initial_estimate = initial_estimate
-        self.spent = spent
-        self.percent_done = percent_done
-
 class _TaskDirective(SphinxDirective):
     required_arguments = 1   # path
 
     option_spec = {
+        'dependencies': utils.list_of_elementpath,
         'implementation-points': int,
         'documentation-points': int,
         'integration-points': int,
         'implementors': utils.list_of_person_and_share,
         'documenters': utils.list_of_person_and_share,
         'integrators': utils.list_of_person_and_share,
-        'dependencies': utils.list_of_elementpath,
-        'responsible': str,
-        'initial-estimate': int,
-        'spent': int,
-        'percent-done': int,
     }
 
     def run(self):
@@ -92,12 +83,8 @@ class _TaskDirective(SphinxDirective):
         documenters = self.options.get('documenters', [])
         integrators = self.options.get('integrators', [])
 
-        responsible = self.options.get('responsible', '')
-        initial_estimate = self.options.get('initial-estimate', 0)
-        spent = self.options.get('spent', 0)
-        percent_done = self.options.get('percent-done', 0)
-
         task = _TaskNode(path = path, 
+                         dependencies = dependencies,
 
                          implementation_points = implementation_points,
                          documentation_points = documentation_points,
@@ -105,12 +92,7 @@ class _TaskDirective(SphinxDirective):
                          implementors = implementors,
                          integrators = integrators,
                          documenters = documenters,
-
-                         dependencies = dependencies,
-                         responsible = responsible,
-                         initial_estimate = initial_estimate, 
-                         spent = spent, 
-                         percent_done = percent_done)
+                        )
         task.document = self.state.document
         set_source_info(self, task)
 
