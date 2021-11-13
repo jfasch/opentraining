@@ -179,7 +179,6 @@ class _GraphExpander:
 
     def _dot_node_lines(self, node, hilit):
         uri = self._app.builder.get_relative_uri(from_=self._docname, to=node.docname)
-        # uri = self._app.builder.get_target_uri(node.docname)
         node_id = '_'.join(node.path)
 
         border = 1
