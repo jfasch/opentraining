@@ -34,7 +34,7 @@ def _ev_doctree_resolved__expand_pointscollected_nodes(app, doctree, docname):
         grading = Grading(persons = persons, tasks = tasks)
         bl = nodes.bullet_list()
         for person, points in grading.points_per_person():
-            elems = [nodes.Text(f'{person.firstname} {person.lastname}: {points}')]
+            elems = [nodes.Text(f'{person.title}: {points}')]
             p = nodes.paragraph()
             p += elems
             li = nodes.list_item()
