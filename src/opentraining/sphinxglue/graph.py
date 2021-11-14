@@ -210,15 +210,11 @@ class _GraphExpander:
                 '];',
             ]
         elif isinstance(node, Task):
-            label = '{'
-            label += node.title
-            label += '}'
-
             return [
                 f'{node_id} [',
-                f'    label="{label}";',
+                f'    label=<{node.title}>;',
                 f'    href="{uri}";',
-                '    shape=Mrecord;',
+                '    shape=box;',
                 '    style=filled;',
                 f'    penwidth="{border}"',
 #                f'    fillcolor="{self._percent_to_rgb(node.percent_done)}";'
@@ -226,20 +222,11 @@ class _GraphExpander:
             ]
 
         elif isinstance(node, Person):
-            label = '{'
-            label += node.title
-            label += '|'
-            label += f'Firstname: {node.firstname}'
-            label += '|'
-            label += f'Lastname: {node.lastname}'
-
-            label += '}'
-
             return [
                 f'{node_id} [',
-                f'    label="{label}";',
+                f'    label="{node.title}";',
                 f'    href="{uri}";',
-                '    shape=Mrecord;',
+                '    shape=box;',
                 '    style=filled;',
                 f'    penwidth="{border}";'
                 '];',
