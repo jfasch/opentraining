@@ -31,7 +31,7 @@ def _ev_doctree_resolved__expand_topicgraph_nodes(app, doctree, docname):
         for n in doctree.traverse(_GraphNode):
             expander.expand(n)
     except Exception as err:
-        _logger.warning(f'{docname}: cannot expand topic graph, eoors follow ...\n{err}', location=err.userdata)
+        _logger.warning(f'{docname}: cannot expand topic graph, errors follow ...\n{err}', location=err.userdata)
 
 class _GraphNode(nodes.Element):
     def __init__(self, entries):
