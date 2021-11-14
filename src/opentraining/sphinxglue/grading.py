@@ -22,12 +22,12 @@ def _ev_doctree_resolved__expand_pointscollected_nodes(app, doctree, docname):
         tasks = []
         for person in n.persons:
             try:
-                persons.append(app.ot_soup.element_by_path(person))
+                persons.append(app.ot_soup.element_by_path(person, userdata=n))
             except OpenTrainingError as e:
                 _logger.warning(e, location=n)
         for task in n.tasks:
             try:
-                tasks.append(app.ot_soup.element_by_path(task))
+                tasks.append(app.ot_soup.element_by_path(task, userdata=n))
             except OpenTrainingError as e:
                 _logger.warning(e, location=n)
 

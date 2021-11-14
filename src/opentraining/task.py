@@ -11,11 +11,11 @@ class Task(Node):
                  integration_points, integrators):
 
         if len(implementors) != 0:
-            assert sum(share for person, share in implementors) == 100
+            assert sum(share for person, share in implementors) <= 100
         if len(documenters) != 0:
-            assert sum(share for person, share in documenters) == 100
+            assert sum(share for person, share in documenters) <= 100
         if len(integrators) != 0:
-            assert sum(share for person, share in integrators) == 100
+            assert sum(share for person, share in integrators) <= 100
 
         super().__init__(
             title=title, 
@@ -39,15 +39,15 @@ class Task(Node):
     def resolve_paths(self, soup):
         resolved_implementors = []
         for person_path, share in self.implementors:
-            person = soup.element_by_path(person_path)
+            person = soup.element_by_path(person_path, userdata=self.userdata)
             resolved_implementors.append((person, share))
         resolved_documenters = []
         for person_path, share in self.documenters:
-            person = soup.element_by_path(person_path)
+            person = soup.element_by_path(person_path, userdata=self.userdata)
             resolved_documenters.append((person, share))
         resolved_integrators = []
         for person_path, share in self.integrators:
-            person = soup.element_by_path(person_path)
+            person = soup.element_by_path(person_path, userdata=self.userdata)
             resolved_integrators.append((person, share))
 
         self.implementors = resolved_implementors

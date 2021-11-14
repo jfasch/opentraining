@@ -52,7 +52,7 @@ class _GroupListExpander:
         self._docname = docname
 
     def expand(self, node):
-        group = self._app.ot_soup.element_by_path(node.path)
+        group = self._app.ot_soup.element_by_path(node.path, userdata=node)
         topics = (t for _,t in group.iter_recursive() if isinstance(t, Topic))
         graph = self._app.ot_soup.worldgraph().subgraph(topics)
         topo = topological_sort(graph)
@@ -62,19 +62,19 @@ class _GroupListExpander:
             if not isinstance(topic, Topic):
                 continue
             li = nodes.list_item()
-            li += self._topic_paragraph(topic.path)
+            li += self._topic_paragraph(topic.path, userdata=node)
             bl += li
         node.replace_self(bl)
 
-    def _topic_paragraph(self, path):
-        topic = self._app.ot_soup.element_by_path(path)
+    def _topic_paragraph(self, path, userdata):
+        topic = self._app.ot_soup.element_by_path(path, userdata=userdata)
         assert isinstance(topic, Topic), f'dependency on non-topic {path}?'
         p = nodes.paragraph()
-        p += self._topic_headline_elems(path)
+        p += self._topic_headline_elems(path, userdata=userdata)
         return p
 
-    def _topic_headline_elems(self, path):
-        topic = self._app.ot_soup.element_by_path(path)
+    def _topic_headline_elems(self, path, userdata):
+        topic = self._app.ot_soup.element_by_path(path, userdata=userdata)
         elems = []
         elems.append(nodes.Text(f'{topic.title} ('))
 

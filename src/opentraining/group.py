@@ -35,16 +35,16 @@ class Group(Element):
             element._requested_path = element._requested_path[1:]
             parent.add_element(element)
 
-    def element_by_path(self, path):
+    def element_by_path(self, path, userdata):
         '''Get element by path. path is relative to this group.'''
 
         element = self._children.get(path[0])
         if element is None:
-            raise errors.PathNotFound(f'{self}: no element with name "{path[0]}"', element=element)
+            raise errors.PathNotFound(f'{self}: no element with name "{path[0]}"', userdata=userdata)
         if len(path) == 1:
             return element
 
-        return element.element_by_path(path[1:])
+        return element.element_by_path(path[1:], userdata)
 
     def child_by_name(self, name):
         '''Get direct child element by name.'''

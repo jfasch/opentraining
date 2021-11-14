@@ -72,7 +72,7 @@ class _GraphExpander:
         hilit_nodes = set()
 
         for entry_path in node.entries:
-            entry = self._app.ot_soup.element_by_path(entry_path)
+            entry = self._app.ot_soup.element_by_path(entry_path, userdata=node)
             if isinstance(entry, Node):
                 node_entries.add(entry)
                 hilit_nodes.add(entry)

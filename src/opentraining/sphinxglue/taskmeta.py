@@ -19,8 +19,15 @@ def setup(app):
 def _ev_doctree_resolved__expand_taskmeta_nodes(app, doctree, docname):
     soup.sphinx_create_soup(app)
     for n in doctree.traverse(_TaskMetaNode):
-        task = app.ot_soup.element_by_path(n.path)
-        assert isinstance(task, Task)
+        try:
+            task = app.ot_soup.element_by_path(n.path, userdata=n)
+        except OpenTrainingError as e:
+            _logger.warning(e, location=n)
+            continue
+
+        if not isinstance(task, Task):
+            _logger.warning(f'{task} is not a task', location=n)
+            continue
 
         # simplicity: show task metadata in a bullet list that contain
         # all that's necessary but is not overly beautiful.

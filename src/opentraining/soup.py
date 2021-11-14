@@ -49,8 +49,20 @@ class Soup:
         # can let them resolve their own stuff. for example, a task
         # initially refers to a person's *path* - final situation
         # should be though that a task refers to the person directly.
+        errs = []
         for element in elements_to_resolve:
-            element.resolve_paths(self)
+            try:
+                element.resolve_paths(self)
+            except errors.OpenTrainingError as e:
+                errs.append(e)
+
+        if len(errs):
+            raise errors.CompoundError(
+                'there were errors resolving paths of some elements', errors=errs, 
+                # don't know which thing I could refer to when doing a
+                # global resolve.
+                userdata=None,
+            )
 
         del self._elements
         self.worldgraph()    # only to detect missing dependencies
@@ -60,8 +72,8 @@ class Soup:
     def root(self):
         return self._root_group
 
-    def element_by_path(self, path):
-        return self._root_group.element_by_path(path)
+    def element_by_path(self, path, userdata):
+        return self._root_group.element_by_path(path, userdata)
 
     def worldgraph(self):
         self._assert_committed()
@@ -100,16 +112,20 @@ class Soup:
             self._worldgraph.add_node(elem)
             for target_path in elem.dependencies:
                 try:
-                    target_topic = self.element_by_path(target_path)
+                    target_topic = self.element_by_path(target_path, userdata=elem.userdata)
                     self._worldgraph.add_edge(elem, target_topic)
                 except errors.PathNotFound as e:
                     collected_errors.append(
                         errors.DependencyError(
                             f'{elem.docname} ({elem}): dependency {target_path} not found', 
-                            element=elem))
+                            userdata=elem))
 
         if len(collected_errors) != 0:
-            raise errors.CompoundError('cannot build world graph', errors=collected_errors)
+            raise errors.CompoundError('cannot build world graph', errors=collected_errors, 
+                                       # don't know which thing I could refer to when doing a
+                                       # global resolve.
+                                       userdata=None,
+                                      )
         return self._worldgraph
 
     def _make_hierarchy(self):

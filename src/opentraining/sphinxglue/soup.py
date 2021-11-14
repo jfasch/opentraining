@@ -37,8 +37,4 @@ def sphinx_create_soup(app):
         app.ot_soup.commit()
     except errors.CompoundError as e:
         for err in e.errors:
-            if isinstance(err, errors.ElementError):
-                _logger.warning(str(err), location=err.element.userdata)
-            else:
-                assert False, f'hm. cannot handle {err}'
-            
+            _logger.warning(str(err), location=err.userdata)

@@ -1,25 +1,22 @@
 class OpenTrainingError(Exception):
     '''Base class for all OpenTraining errors'''
+    def __init__(self, msg, userdata):
+        super().__init__(msg)
+        self.userdata = userdata
 
 class BadPath(OpenTrainingError):
     pass
 
-class ElementError(OpenTrainingError):
-    '''Base class for errors tied to a single element'''
-    def __init__(self, msg, element):
-        super().__init__(msg)
-        self.element = element
-
-class DependencyError(ElementError):
+class DependencyError(OpenTrainingError):
     pass
 
-class PathNotFound(ElementError):
+class PathNotFound(OpenTrainingError):
     pass
 
-class NotCommitted(ElementError):
+class NotCommitted(OpenTrainingError):
     pass
 
-class AlreadyCommitted(ElementError):
+class AlreadyCommitted(OpenTrainingError):
     pass
 
 class CompoundError(OpenTrainingError):
@@ -27,6 +24,6 @@ class CompoundError(OpenTrainingError):
     we do not bail out early, but rather continue, and represent the
     user with a list of collected error messages.  '''
 
-    def __init__(self, msg, errors):
-        super().__init__(msg)
+    def __init__(self, msg, errors, userdata):
+        super().__init__(msg, userdata=userdata)
         self.errors = errors
