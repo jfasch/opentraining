@@ -31,7 +31,7 @@ def _ev_doctree_resolved__expand_topicgraph_nodes(app, doctree, docname):
         for n in doctree.traverse(_GraphNode):
             expander.expand(n)
     except Exception as err:
-        _logger.warning(f'{docname}: cannot expand topic graph', location=err.element.userdata)
+        _logger.warning(f'{docname}: cannot expand topic graph, eoors follow ...\n{err}', location=err.userdata)
 
 class _GraphNode(nodes.Element):
     def __init__(self, entries):
@@ -54,10 +54,14 @@ class _GraphExpander:
         self._docname = docname
 
     def expand(self, node):
-        graph, hilit_nodes = self._graphnode_to_graph(node)
-        dot = self._graph_to_dot(graph=graph, hilit_nodes=hilit_nodes)
-        svg = self._dot_to_svg(dot=dot)
-        node.replace_self(nodes.raw(svg, svg, format='html'))
+        try:
+            graph, hilit_nodes = self._graphnode_to_graph(node)
+            dot = self._graph_to_dot(graph=graph, hilit_nodes=hilit_nodes, node=node)
+            svg = self._dot_to_svg(dot=dot, node=node)
+            node.replace_self(nodes.raw(svg, svg, format='html'))
+        except errors.OpenTrainingError as e:
+            node.replace_self([])
+            raise
 
     def _graphnode_to_graph(self, node):
         assert isinstance(node, _GraphNode)
@@ -85,13 +89,13 @@ class _GraphExpander:
 
         return self._app.ot_soup.subgraph(node_entries), hilit_nodes
 
-    def _graph_to_dot(self, graph, hilit_nodes):
+    def _graph_to_dot(self, graph, hilit_nodes, node):
         lines = [
             'digraph {',
         ]
 
-        root_cluster = self._dot_group_clusters(graph)
-        lines.extend(self._dot_cluster_lines(root_cluster, hilit_nodes=hilit_nodes))
+        root_cluster = self._dot_group_clusters(graph, node=node)
+        lines.extend(self._dot_cluster_lines(root_cluster, hilit_nodes=hilit_nodes, node=node))
 
         for src, dst in graph.edges:
             lines.extend(self._dot_edge_lines(src, dst))
@@ -106,7 +110,7 @@ class _GraphExpander:
             self.clusters = []
             self.nodes = []  # leaf topics
 
-    def _dot_group_clusters(self, graph):
+    def _dot_group_clusters(self, graph, node):
         root_cluster = self.Cluster(self._app.ot_soup.root)
 
         have_clusters = { self._app.ot_soup.root: root_cluster }
@@ -114,24 +118,24 @@ class _GraphExpander:
         # containing groups
         for n in graph.nodes:
             assert isinstance(n, Node), n
-            cluster = self._dot_make_cluster(n.parent, have_clusters)
+            cluster = self._dot_make_cluster(n.parent, have_clusters, node=node)
             cluster.nodes.append(n)
 
         return root_cluster
 
-    def _dot_make_cluster(self, group, have_clusters):
+    def _dot_make_cluster(self, group, have_clusters, node):
         assert type(group) is Group
 
         cluster = have_clusters.get(group)
         if not cluster:
             cluster = self.Cluster(group)
             have_clusters[group] = cluster
-            parent_cluster = self._dot_make_cluster(group.parent, have_clusters)
+            parent_cluster = self._dot_make_cluster(group.parent, have_clusters, node=node)
             parent_cluster.clusters.append(cluster)
 
         return cluster
 
-    def _dot_cluster_lines(self, cluster, hilit_nodes):
+    def _dot_cluster_lines(self, cluster, hilit_nodes, node):
         lines = []
         if cluster.group is not self._app.ot_soup.root:
             lines.append('subgraph cluster_' + self._dot_id_from_path(cluster.group.path) + '{')
@@ -141,7 +145,7 @@ class _GraphExpander:
         for n in cluster.nodes:
             lines.extend(self._dot_node_lines(n, hilit=(n in hilit_nodes)))
         for subcluster in cluster.clusters:
-            lines.extend(self._dot_cluster_lines(subcluster, hilit_nodes))
+            lines.extend(self._dot_cluster_lines(subcluster, hilit_nodes, node=node))
 
         if cluster.group is not self._app.ot_soup.root:
             lines.append('}')
@@ -247,13 +251,13 @@ class _GraphExpander:
         return [f'{src_id} -> {dst_id};']
 
     _re_width = re.compile(r'width\s*=\s*".*"')
-    def _dot_to_svg(self, dot):
+    def _dot_to_svg(self, dot, node):
         try:
             completed = subprocess.run(
                 ['dot', '-v', '-T', 'svg'],
                 input=dot, check=True, text=True, capture_output=True)
         except subprocess.CalledProcessError as e:
-            raise errors.OpenTrainingError(f'dot exited with status {e.returncode}:\n[dot]\n{dot}\n[stderr]\n{e.stderr}')
+            raise errors.OpenTrainingError(f'dot exited with status {e.returncode}:\n[dot]\n{dot}\n[stderr]\n{e.stderr}', userdata=node)
     
         svg = completed.stdout
         # strip XML declaration (we are embedding it)
