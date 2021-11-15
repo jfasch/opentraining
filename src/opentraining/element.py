@@ -4,6 +4,7 @@ from . import errors
 class Element:
     '''
     Base of all OpenTraining artifacts (Topic, Exercise, Task, Person, ...)
+
     '''
     def __init__(self, title, path, docname, userdata):
         ''':param title: string that is sometimes (?) displayed somewhere (?)
