@@ -33,8 +33,6 @@ def _ev_doctree_resolved__expand_topicgraph_nodes(app, doctree, docname):
             expander.expand(n)
     except OpenTrainingError as err:
         _logger.warning(f'{docname}: cannot expand topic graph, errors follow ...\n{err}', location=err.userdata)
-    except Exception as err:
-        _logger.warning(f'{docname}: cannot expand topic graph {err}', location=docname)
 
 class _GraphNode(nodes.Element):
     def __init__(self, entries):
@@ -248,6 +246,8 @@ class _GraphExpander:
                 input=dot, check=True, text=True, capture_output=True)
         except subprocess.CalledProcessError as e:
             raise errors.OpenTrainingError(f'dot exited with status {e.returncode}:\n[dot]\n{dot}\n[stderr]\n{e.stderr}', userdata=node)
+        except FileNotFoundError as e:
+            raise errors.OpenTrainingError('dot not installed; please install the "graphviz" package (Debianish: "sudo apt install graphviz", Fedorish: "dnf install graphviz")', userdata=node)
     
         svg = completed.stdout
         # strip XML declaration (we are embedding it)
