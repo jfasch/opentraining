@@ -7,6 +7,7 @@ from ..task import Task
 from ..person import Person
 from ..node import Node
 from ..group import Group
+from ..errors import OpenTrainingError
 
 from sphinx.util.docutils import SphinxDirective
 from sphinx.util.nodes import set_source_info
@@ -30,8 +31,10 @@ def _ev_doctree_resolved__expand_topicgraph_nodes(app, doctree, docname):
         expander = _GraphExpander(app=app, docname=docname)
         for n in doctree.traverse(_GraphNode):
             expander.expand(n)
-    except Exception as err:
+    except OpenTrainingError as err:
         _logger.warning(f'{docname}: cannot expand topic graph, errors follow ...\n{err}', location=err.userdata)
+    except Exception as err:
+        _logger.warning(f'{docname}: cannot expand topic graph {err}', location=docname)
 
 class _GraphNode(nodes.Element):
     def __init__(self, entries):
