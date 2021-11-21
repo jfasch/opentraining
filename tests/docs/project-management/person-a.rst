@@ -1,6 +1,6 @@
 .. ot-person:: opentraining.tests.project_management.person_a
-   :firstname: a
-   :lastname: A
+   :firstname: Sepp
+   :lastname: Huber
 
-Person A
-========
+Sepp Huber
+==========

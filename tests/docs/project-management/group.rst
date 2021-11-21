@@ -23,6 +23,7 @@ Points Collected
 	     opentraining.tests.project_management.person_c
    :tasks: opentraining.tests.project_management.task_lo,
 	   opentraining.tests.project_management.task_hi
+   :shape: table
 	     
 
 Dependencies

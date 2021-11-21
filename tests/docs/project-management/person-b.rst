@@ -1,6 +1,6 @@
 .. ot-person:: opentraining.tests.project_management.person_b
-   :firstname: b
-   :lastname: B
+   :firstname: Joerg
+   :lastname: Faschingbauer
 
-Person B
-========
+Jörg Faschingbauer
+==================

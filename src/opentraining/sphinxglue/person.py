@@ -61,6 +61,9 @@ class _PersonDirective(SphinxDirective):
                              firstname=firstname,
                              lastname=lastname)
         person.document = self.state.document
+
+        print('jjjjjjjjjjjjjjjjjjjjj', type(person.document))
+
         set_source_info(self, person)
 
         return [person]
