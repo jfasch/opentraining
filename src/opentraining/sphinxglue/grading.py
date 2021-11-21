@@ -64,10 +64,13 @@ def _ev_doctree_resolved__expand_pointscollected_nodes(app, doctree, docname):
             row += entry
             p = nodes.paragraph()
             entry += p
-            p += [utils.make_reference(
-                text=f'{person.firstname} {person.lastname}',
-                from_docname=docname, to_docname=person.docname,
-                app=app)]
+            if person.firstname and person.lastname:
+                text = f' {person.lastname} {person.firstname}'
+            else:
+                text = person.title
+            p += [utils.make_reference(text=text,
+                                       from_docname=docname, to_docname=person.docname,
+                                       app=app)]
 
             # points
             entry = nodes.entry()

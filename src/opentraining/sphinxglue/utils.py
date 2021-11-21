@@ -31,5 +31,4 @@ def make_reference(text, from_docname, to_docname, app):
     ref = nodes.reference()
     ref['refuri'] = app.builder.get_relative_uri(from_=from_docname, to=to_docname)
     ref += nodes.Text(text)
-    print('jjjjjjjjjjjjjjjjjjjjj refuri', ref)
     return ref
