@@ -35,7 +35,6 @@ Score Table: Implicit - Persons and Tasks by Group
    :persons: opentraining.tests.project_management
    :tasks: opentraining.tests.project_management
    :shape: table
-	     
 
 Dependencies
 ------------

@@ -3,8 +3,16 @@ from opentraining.person import Person
 from opentraining.task import Task
 from opentraining.group import Group
 
+import pytest
 
-def test_task_resolve_hints():
+from collections import namedtuple
+
+
+Project = namedtuple('Project', ('implementor', 'documenter', 'integrator', 'task', 'group', 'soup'))
+
+
+@pytest.fixture
+def my_project():
     implementor = Person(
         title=None,
         path=['blah', 'implementor'],
@@ -49,15 +57,16 @@ def test_task_resolve_hints():
         docname=None, 
         userdata=None)
 
-    soup = Soup()
-    soup.add_element(implementor)
-    soup.add_element(documenter)
-    soup.add_element(integrator)
-    soup.add_element(task)
-    soup.add_element(group)
-    soup.commit()
+    return Project(implementor = implementor,
+                   documenter = documenter, 
+                   integrator = integrator, 
+                   task = task, 
+                   group = group,
+                   soup = Soup((implementor, documenter, integrator, task, group)))
 
-    assert task.implementors == [(implementor, 100)]
-    assert task.documenters == [(documenter, 100)]
-    assert task.integrators == [(integrator, 100)]
+
+def test_task_resolve_hints(my_project):
+    assert my_project.task.implementors == [(my_project.implementor, 100)]
+    assert my_project.task.documenters == [(my_project.documenter, 100)]
+    assert my_project.task.integrators == [(my_project.integrator, 100)]
 

@@ -13,10 +13,14 @@ from networkx.exception import NetworkXError
 
 
 class Soup:
-    def __init__(self):
+    def __init__(self, elements=None):
         self._elements = set()
         self._root_group = None
         self._worldgraph = None
+
+        if elements: 
+            self.add_elements(elements)
+            self.commit()
 
     def __len__(self):
         # well this is a bit dumb
@@ -28,6 +32,10 @@ class Soup:
         if self._worldgraph:
             raise errors.OpenTrainingError(f'cannot add {element}: graph already made')
         self._elements.add(element)
+
+    def add_elements(self, elements):
+        for e in elements:
+            self.add_element(e)
 
     def commit(self):
         if self._root_group is not None:

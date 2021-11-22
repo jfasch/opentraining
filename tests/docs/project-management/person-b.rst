@@ -4,3 +4,6 @@
 
 Jörg Faschingbauer
 ==================
+
+.. ot-personstats:: opentraining.tests.project_management.person_b
+   
