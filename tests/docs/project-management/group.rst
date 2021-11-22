@@ -17,7 +17,7 @@ Project Management
 Points Collected
 ----------------
 
-.. ot-pointscollected::
+.. ot-scoretable::
    :persons: opentraining.tests.project_management.person_a,
 	     opentraining.tests.project_management.person_b,
 	     opentraining.tests.project_management.person_c

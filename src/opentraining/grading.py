@@ -6,7 +6,7 @@ class Grading:
         self.persons = persons
         self.tasks = tasks
 
-    def points_per_person(self):
+    def score_table(self):
         'Return iterable of (person, points)'
 
         points_per_person = defaultdict(int)

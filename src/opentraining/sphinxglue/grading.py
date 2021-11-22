@@ -14,11 +14,11 @@ _logger = logging.getLogger(__name__)
 
 
 def setup(app):
-    app.add_directive('ot-pointscollected', _PointsCollectedDirective)
-    app.connect('doctree-resolved', _ev_doctree_resolved__expand_pointscollected_nodes)
+    app.add_directive('ot-scoretable', _ScoreTableDirective)
+    app.connect('doctree-resolved', _ev_doctree_resolved__expand_scoretable_nodes)
 
-def _ev_doctree_resolved__expand_pointscollected_nodes(app, doctree, docname):
-    for n in doctree.traverse(_PointsCollectedNode):
+def _ev_doctree_resolved__expand_scoretable_nodes(app, doctree, docname):
+    for n in doctree.traverse(_ScoreTableNode):
         persons = []
         tasks = []
         for person in n.persons:
@@ -55,7 +55,7 @@ def _ev_doctree_resolved__expand_pointscollected_nodes(app, doctree, docname):
         tbody = nodes.tbody()
         tgroup += tbody
 
-        for person, points in sorted(grading.points_per_person(), key=lambda elem: (elem[0].lastname, elem[0].firstname)):
+        for person, points in sorted(grading.score_table(), key=lambda elem: (elem[0].lastname, elem[0].firstname)):
             row = nodes.row()
             tbody += row
 
@@ -79,7 +79,7 @@ def _ev_doctree_resolved__expand_pointscollected_nodes(app, doctree, docname):
 
         n.replace_self([table])
 
-class _PointsCollectedNode(nodes.Element):
+class _ScoreTableNode(nodes.Element):
     def __init__(self, persons, tasks, shape):
         super().__init__(self)
         self.title = None
@@ -91,7 +91,7 @@ class _PointsCollectedNode(nodes.Element):
 def _table_or_list(argument):
     return directives.choice(argument, ('table', 'list'))
 
-class _PointsCollectedDirective(SphinxDirective):
+class _ScoreTableDirective(SphinxDirective):
     required_arguments = 0
     option_spec = {
         'persons': utils.list_of_elementpath,
@@ -104,13 +104,13 @@ class _PointsCollectedDirective(SphinxDirective):
         tasks = self.options.get('tasks')
         shape = self.options.get('shape', 'list')
 
-        pointcollected = _PointsCollectedNode(
+        scores = _ScoreTableNode(
             persons = persons,
             tasks = tasks,
             shape = shape,
         )
 
-        pointcollected.document = self.state.document
-        set_source_info(self, pointcollected)
+        scores.document = self.state.document
+        set_source_info(self, scores)
 
-        return [pointcollected]
+        return [scores]

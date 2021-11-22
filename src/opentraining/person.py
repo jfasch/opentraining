@@ -1,4 +1,5 @@
 from .node import Node
+from . import errors
 
 
 class Person(Node):  # is-a Node only because that holds path,
@@ -12,6 +13,12 @@ class Person(Node):  # is-a Node only because that holds path,
             userdata=userdata,
             dependencies=[], 
             )
+
+        if not firstname:
+            raise OpenTrainingError('firstname must be set')
+        if not lastname:
+            raise OpenTrainingError('lastname must be set')
+
         self.firstname = firstname
         self.lastname = lastname
 
