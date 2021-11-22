@@ -9,6 +9,7 @@ from . import element
 
 from networkx.algorithms.dag import descendants
 from networkx import DiGraph
+from networkx.exception import NetworkXError
 
 
 class Soup:
@@ -19,7 +20,7 @@ class Soup:
 
     def __len__(self):
         # well this is a bit dumb
-        return len(list(self._root_group.iter_recursive()))
+        return len(list(self._root_group.iter_recursive(userdata=None)))
 
     def add_element(self, element):
         assert isinstance(element, Element)
@@ -79,7 +80,7 @@ class Soup:
         self._assert_committed()
         return self._make_worldgraph()
 
-    def subgraph(self, entrypoints):
+    def subgraph(self, entrypoints, userdata):
         '''Given entrypoints, compute a subgraph of the world graph that
         contains the entrypoints and all their descendants.
 
@@ -106,7 +107,7 @@ class Soup:
 
         collected_errors = []
         self._worldgraph = DiGraph()
-        for name, elem in self._root_group.iter_recursive():
+        for name, elem in self._root_group.iter_recursive(cls=Node, userdata=None):
             if not isinstance(elem, Node):
                 continue
             self._worldgraph.add_node(elem)

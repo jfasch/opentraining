@@ -17,12 +17,23 @@ Project Management
 Points Collected
 ----------------
 
+Score Table: Explicit Persons and Tasks
+.......................................
+
 .. ot-scoretable::
    :persons: opentraining.tests.project_management.person_a,
 	     opentraining.tests.project_management.person_b,
 	     opentraining.tests.project_management.person_c
    :tasks: opentraining.tests.project_management.task_lo,
 	   opentraining.tests.project_management.task_hi
+   :shape: table
+	     
+Score Table: Implicit - Persons and Tasks by Group
+..................................................
+
+.. ot-scoretable::
+   :persons: opentraining.tests.project_management
+   :tasks: opentraining.tests.project_management
    :shape: table
 	     
 

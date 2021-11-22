@@ -76,15 +76,18 @@ class Group(Element):
         '''Iterator (name, element) over direct children'''
         yield from self._children.items()
 
-    def iter_recursive(self):
+    def iter_recursive(self, userdata, cls=None):
         '''Iterator (name, element) over descendants, recursively'''
+        if cls:
+            if not issubclass(cls, Element):
+                raise errors.OpenTrainingError(f'{cls} is not a subclass of {Element}', userdata)
+        else:
+            cls = Element
+
         for name, elem in self._children.items():
-            if isinstance(elem, Node):
+            if isinstance(elem, Group):
+                if cls is Group:
+                    yield name, elem
+                yield from elem.iter_recursive(userdata, cls)
+            elif isinstance(elem, cls):
                 yield name, elem
-            elif isinstance(elem, Group):
-                yield name, elem
-                #yield from elem.iter_children_dfs()
-                for n,e in elem.iter_recursive():
-                    yield n,e
-            else:
-                assert False, f'invalid element type {type(e)}'

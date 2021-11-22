@@ -82,13 +82,13 @@ class _GraphExpander:
                 node_entries.add(entry)
                 hilit_nodes.add(entry)
             elif isinstance(entry, Group):
-                for _, elem in entry.iter_recursive():
+                for _, elem in entry.iter_recursive(cls=Node, userdata=node):
                     if isinstance(elem, Node):
                         node_entries.add(elem)
             else:
                 assert False, entry_path
 
-        return self._app.ot_soup.subgraph(node_entries), hilit_nodes
+        return self._app.ot_soup.subgraph(node_entries, userdata=node), hilit_nodes
 
     def _graph_to_dot(self, graph, hilit_nodes, node):
         lines = [

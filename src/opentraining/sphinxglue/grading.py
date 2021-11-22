@@ -1,6 +1,9 @@
 from . import utils
 from . import soup
 from ..grading import Grading
+from ..person import Person
+from ..task import Task
+from ..group import Group
 from ..errors import OpenTrainingError
 
 from sphinx.util.docutils import SphinxDirective
@@ -23,12 +26,20 @@ def _ev_doctree_resolved__expand_scoretable_nodes(app, doctree, docname):
         tasks = []
         for person in n.persons:
             try:
-                persons.append(app.ot_soup.element_by_path(person, userdata=n))
+                elem = app.ot_soup.element_by_path(person, userdata=n)
+                if isinstance(elem, Person):
+                    persons.append(elem)
+                elif isinstance(elem, Group):
+                    persons.extend(el for _,el in elem.iter_recursive(cls=Person, userdata=n))
             except OpenTrainingError as e:
                 _logger.warning(e, location=n)
         for task in n.tasks:
             try:
-                tasks.append(app.ot_soup.element_by_path(task, userdata=n))
+                elem = app.ot_soup.element_by_path(task, userdata=n)
+                if isinstance(elem, Task):
+                    tasks.append(elem)
+                elif isinstance(elem, Group):
+                    tasks.extend(el for _,el in elem.iter_recursive(cls=Task, userdata=n))
             except OpenTrainingError as e:
                 _logger.warning(e, location=n)
 
