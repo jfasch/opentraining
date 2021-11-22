@@ -72,10 +72,6 @@ class Group(Element):
                 return True
         return False
 
-    def iter_children(self):
-        '''Iterator (name, element) over direct children'''
-        yield from self._children.items()
-
     def iter_recursive(self, userdata, cls=None):
         '''Iterator (name, element) over descendants, recursively'''
         if cls:
@@ -87,7 +83,7 @@ class Group(Element):
         for name, elem in self._children.items():
             if isinstance(elem, Group):
                 if cls is Group:
-                    yield name, elem
+                    yield elem
                 yield from elem.iter_recursive(userdata, cls)
             elif isinstance(elem, cls):
-                yield name, elem
+                yield elem

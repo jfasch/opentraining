@@ -30,7 +30,7 @@ def _ev_doctree_resolved__expand_scoretable_nodes(app, doctree, docname):
                 if isinstance(elem, Person):
                     persons.append(elem)
                 elif isinstance(elem, Group):
-                    persons.extend(el for _,el in elem.iter_recursive(cls=Person, userdata=n))
+                    persons.extend(elem.iter_recursive(cls=Person, userdata=n))
             except OpenTrainingError as e:
                 _logger.warning(e, location=n)
         for task in n.tasks:
@@ -39,7 +39,7 @@ def _ev_doctree_resolved__expand_scoretable_nodes(app, doctree, docname):
                 if isinstance(elem, Task):
                     tasks.append(elem)
                 elif isinstance(elem, Group):
-                    tasks.extend(el for _,el in elem.iter_recursive(cls=Task, userdata=n))
+                    tasks.extend(elem.iter_recursive(cls=Task, userdata=n))
             except OpenTrainingError as e:
                 _logger.warning(e, location=n)
 

@@ -107,7 +107,7 @@ class Soup:
 
         collected_errors = []
         self._worldgraph = DiGraph()
-        for name, elem in self._root_group.iter_recursive(cls=Node, userdata=None):
+        for elem in self._root_group.iter_recursive(cls=Node, userdata=None):
             if not isinstance(elem, Node):
                 continue
             self._worldgraph.add_node(elem)

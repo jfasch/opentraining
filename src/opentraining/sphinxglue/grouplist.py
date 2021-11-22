@@ -53,7 +53,7 @@ class _GroupListExpander:
 
     def expand(self, node):
         group = self._app.ot_soup.element_by_path(node.path, userdata=node)
-        topics = (t for _,t in group.iter_recursive(cls=Topic, userdata=node))
+        topics = group.iter_recursive(cls=Topic, userdata=node)
         graph = self._app.ot_soup.worldgraph().subgraph(topics)
         topo = topological_sort(graph)
 
