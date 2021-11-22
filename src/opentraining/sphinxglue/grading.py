@@ -55,7 +55,7 @@ def _ev_doctree_resolved__expand_pointscollected_nodes(app, doctree, docname):
         tbody = nodes.tbody()
         tgroup += tbody
 
-        for person, points in grading.points_per_person():
+        for person, points in sorted(grading.points_per_person(), key=lambda elem: (elem[0].lastname, elem[0].firstname)):
             row = nodes.row()
             tbody += row
 
