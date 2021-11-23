@@ -36,5 +36,5 @@ def sphinx_create_soup(app):
     try:
         app.ot_soup.commit()
     except errors.CompoundError as e:
-        for err in e.errors:
+        for err in e:
             _logger.warning(str(err), location=err.userdata)

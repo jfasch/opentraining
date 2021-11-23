@@ -10,25 +10,25 @@ Project Management
 
    task-hi
    task-lo
-   person-a
-   person-b
-   person-c
+   person-faschingbauer
+   person-huber
+   person-queen
 
 Points Collected
 ----------------
 
-Score Table: Explicit Persons and Tasks
-.......................................
+Score Table: Explicit
+.....................
 
 .. ot-scoretable::
-   :persons: opentraining.tests.project_management.person_a,
-	     opentraining.tests.project_management.person_b,
-	     opentraining.tests.project_management.person_c
+   :persons: opentraining.tests.project_management.person_faschingbauer,
+	     opentraining.tests.project_management.person_huber,
+	     opentraining.tests.project_management.person_queen
    :tasks: opentraining.tests.project_management.task_lo,
 	   opentraining.tests.project_management.task_hi
    :shape: table
 	     
-Score Table: Implicit - Persons and Tasks by Group
+Score Table: Implicit (Persons and Tasks by Group)
 ..................................................
 
 .. ot-scoretable::

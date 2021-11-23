@@ -3,9 +3,10 @@ from collections import defaultdict
 
 class Grading:
 
-    def __init__(self, persons, tasks):
+    def __init__(self, persons, tasks, userdata):
         self.persons = persons
         self.tasks = tasks
+        self.userdata = userdata
 
     def score_table(self):
         'Return iterable of (person, points)'

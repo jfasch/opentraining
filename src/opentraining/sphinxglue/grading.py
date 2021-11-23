@@ -43,7 +43,7 @@ def _ev_doctree_resolved__expand_scoretable_nodes(app, doctree, docname):
             except OpenTrainingError as e:
                 _logger.warning(e, location=n)
 
-        grading = Grading(persons = persons, tasks = tasks)
+        grading = Grading(persons = persons, tasks = tasks, userdata = n)
 
         table = nodes.table()
         tgroup = nodes.tgroup(cols=2)

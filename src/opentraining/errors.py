@@ -34,3 +34,11 @@ class CompoundError(OpenTrainingError):
         for e in self.errors:
             msgs.append(' '*4 + str(e))
         return '\n'.join(msgs)
+
+    def __iter__(self):
+        yield CompoundError(self.msg, errors=[], userdata=self.userdata)
+        for e in self.errors:
+            if isinstance(e, CompoundError):
+                yield from e
+            else:
+                yield e

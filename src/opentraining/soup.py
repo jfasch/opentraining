@@ -70,7 +70,7 @@ class Soup:
                 'there were errors resolving paths of some elements', errors=errs, 
                 # don't know which thing I could refer to when doing a
                 # global resolve.
-                userdata=self._userdata,
+                userdata=None,
             )
 
         del self._elements
@@ -133,7 +133,7 @@ class Soup:
             raise errors.CompoundError('cannot build world graph', errors=collected_errors, 
                                        # don't know which thing I could refer to when doing a
                                        # global resolve.
-                                       userdata=self._userdata,
+                                       userdata=None,
                                       )
         return self._worldgraph
 
