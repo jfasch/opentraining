@@ -12,18 +12,16 @@ class Group(Element):
             userdata=userdata)
         self._children = {}    # {name: element}
 
-    def __str__(self):
-        return 'Group:'+super().__str__()
-
     def __len__(self):
         return len(self._children)
 
-    def add_element(self, element):
+    def add_element(self, element, userdata):
         child_name = element._requested_path[0]
         if len(element._requested_path) == 1: # leaf; add to children
             child = self._children.get(child_name)
             if child:
-                raise errors.OpenTrainingError(f'{self}: cannot add "{child_name}"; already exists: {child}')
+                raise errors.OpenTrainingError(f'{self}: cannot add "{child_name}"; already exists: {child}', 
+                                               userdata=userdata)
             self._children[child_name] = element
             del element._requested_path
             element.parent = self
@@ -33,7 +31,7 @@ class Group(Element):
                 raise errors.OpenTrainingError(f'{self}: cannot add "{element._requested_path}": '
                                         f'intermediate "{child_name}" does not exist')
             element._requested_path = element._requested_path[1:]
-            parent.add_element(element)
+            parent.add_element(element, userdata=self.userdata)
 
     def element_by_path(self, path, userdata):
         '''Get element by path. path is relative to this group.'''

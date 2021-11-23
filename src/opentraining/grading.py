@@ -2,6 +2,7 @@ from collections import defaultdict
 
 
 class Grading:
+
     def __init__(self, persons, tasks):
         self.persons = persons
         self.tasks = tasks
@@ -23,3 +24,21 @@ class Grading:
                 points_per_person[person] += points
 
         return ((person, points_per_person[person]) for person in self.persons)
+
+    def person_score(self, person):
+        assert person in self.persons
+
+        score = 0
+
+        for task in self.tasks:
+            for p, share in task.implementors:
+                if p is person:
+                    score += task.implementation_points * share
+            for p, share in task.documenters:
+                if p is person:
+                    score += task.documentation_points * share
+            for p, share in task.integrators:
+                if p is person:
+                    score += task.integration_points * share
+
+        return score

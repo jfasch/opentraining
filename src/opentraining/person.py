@@ -21,6 +21,3 @@ class Person(Node):  # is-a Node only because that holds path,
 
         self.firstname = firstname
         self.lastname = lastname
-
-    def __str__(self):
-        return f'Person:{str(super())}, firstname:{self.firstname}, lastname:{self.lastname}'

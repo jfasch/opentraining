@@ -26,4 +26,11 @@ class CompoundError(OpenTrainingError):
 
     def __init__(self, msg, errors, userdata):
         super().__init__(msg, userdata=userdata)
+        self.msg = msg
         self.errors = errors
+
+    def __str__(self):
+        msgs = [self.msg]
+        for e in self.errors:
+            msgs.append(' '*4 + str(e))
+        return '\n'.join(msgs)

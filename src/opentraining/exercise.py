@@ -9,6 +9,3 @@ class Exercise(Node):
             docname=docname, 
             dependencies=dependencies, 
             userdata=userdata)
-
-    def __str__(self):
-        return 'Exercise:'+super().__str__()

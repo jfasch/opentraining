@@ -8,11 +8,11 @@ import pytest
 from collections import namedtuple
 
 
-Project = namedtuple('Project', ('implementor', 'documenter', 'integrator', 'task', 'group', 'soup'))
+_Project = namedtuple('_Project', ('implementor', 'documenter', 'integrator', 'task', 'group', 'soup'))
 
 
 @pytest.fixture
-def my_project():
+def _my_project():
     implementor = Person(
         title=None,
         path=['blah', 'implementor'],
@@ -57,16 +57,19 @@ def my_project():
         docname=None, 
         userdata=None)
 
-    return Project(implementor = implementor,
-                   documenter = documenter, 
-                   integrator = integrator, 
-                   task = task, 
-                   group = group,
-                   soup = Soup((implementor, documenter, integrator, task, group)))
+    soup = Soup((implementor, documenter, integrator, task, group))
+
+    return _Project(implementor = implementor,
+                    documenter = documenter, 
+                    integrator = integrator, 
+                    task = task, 
+                    group = group,
+                    soup = soup,
+                    )
 
 
-def test_task_resolve_hints(my_project):
-    assert my_project.task.implementors == [(my_project.implementor, 100)]
-    assert my_project.task.documenters == [(my_project.documenter, 100)]
-    assert my_project.task.integrators == [(my_project.integrator, 100)]
+def test_task_resolve_hints(_my_project):
+    assert _my_project.task.implementors == [(_my_project.implementor, 100)]
+    assert _my_project.task.documenters == [(_my_project.documenter, 100)]
+    assert _my_project.task.integrators == [(_my_project.integrator, 100)]
 

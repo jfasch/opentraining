@@ -9,6 +9,3 @@ class Topic(Node):
             docname=docname, 
             dependencies=dependencies, 
             userdata=userdata)
-
-    def __str__(self):
-        return 'Topic:'+super().__str__()

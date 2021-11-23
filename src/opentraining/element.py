@@ -27,7 +27,7 @@ class Element:
 
         '''
 
-        _verify_is_path(path)
+        verify_is_path(path, userdata)
 
         self.title = title
         self.docname = docname
@@ -38,31 +38,32 @@ class Element:
             self.parent = None
 
     def __str__(self):
-        if hasattr(self, '_requested_path'):
-            return f'{self._requested_path} (uncommitted)'
-        else:
-            return f'{self.path}'
+        c = self.committed() and 'committed' or 'uncommitted'
+        return f'{str(type(self))}({self.path},{c})'
+
+    def committed(self):
+        return not hasattr(self, '_requested_path')
 
     @property
     def path(self):
         if hasattr(self, '_requested_path'):
-            raise errors.OpenTrainingError(f'{self} is not yet committed (path not known)')
+            return self._requested_path
         if self.parent:
             return self.parent.path + [self.parent.element_name(self)]
         else:
-            return []
+            return []  # root
 
     def resolve_paths(self, soup):
         pass
 
 
-def _verify_is_path(path):
+def verify_is_path(path, userdata):
     if type(path) not in (list, tuple):
-        raise errors.BadPath(f'Not a valid path: {path} is neither list nor tuple')
+        raise errors.BadPath(f'Not a valid path: {repr(path)} is neither list nor tuple', userdata=userdata)
         
     for elem in path:
         if type(elem) is not str:
-            raise errors.BadPath(f'Not a valid path: {path} ({elem} is not str)')
+            raise errors.BadPath(f'Not a valid path: {path} ({elem} is not str)', userdata=userdata)
         if not elem.isidentifier():
-            raise errors.BadPath(f'Not a valid path: {path} ({elem} is not an identifier)')
+            raise errors.BadPath(f'Not a valid path: {path} ({elem} is not an identifier)', userdata=userdata)
     

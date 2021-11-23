@@ -1,4 +1,6 @@
 from .node import Node
+from .element import verify_is_path
+from . import errors
 
 
 class Task(Node):
@@ -17,6 +19,11 @@ class Task(Node):
         if len(integrators) != 0:
             assert sum(share for person, share in integrators) <= 100
 
+        # in tests this is easily gotten wrong
+        for p,_ in implementors: verify_is_path(p, userdata=userdata)
+        for p,_ in documenters: verify_is_path(p, userdata=userdata)
+        for p,_ in integrators: verify_is_path(p, userdata=userdata)
+
         super().__init__(
             title=title, 
             path=path, 
@@ -33,22 +40,33 @@ class Task(Node):
         self.documenters = documenters
         self.integrators = integrators
 
-    def __str__(self):
-        return 'Task:'+super().__str__()
-
     def resolve_paths(self, soup):
+        errs = []
         resolved_implementors = []
-        for person_path, share in self.implementors:
-            person = soup.element_by_path(person_path, userdata=self.userdata)
-            resolved_implementors.append((person, share))
         resolved_documenters = []
-        for person_path, share in self.documenters:
-            person = soup.element_by_path(person_path, userdata=self.userdata)
-            resolved_documenters.append((person, share))
         resolved_integrators = []
+
+        for person_path, share in self.implementors:
+            try:
+                person = soup.element_by_path(person_path, userdata=self.userdata)
+                resolved_implementors.append((person, share))
+            except errors.OpenTrainingError as e:
+                errs.append(e)
+        for person_path, share in self.documenters:
+            try:
+                person = soup.element_by_path(person_path, userdata=self.userdata)
+                resolved_documenters.append((person, share))
+            except errors.OpenTrainingError as e:
+                errs.append(e)
         for person_path, share in self.integrators:
-            person = soup.element_by_path(person_path, userdata=self.userdata)
-            resolved_integrators.append((person, share))
+            try:
+                person = soup.element_by_path(person_path, userdata=self.userdata)
+                resolved_integrators.append((person, share))
+            except errors.OpenTrainingError as e:
+                errs.append(e)
+
+        if errs:
+            raise errors.CompoundError(f'could not resolve some paths of {self}', errs, userdata=None)
 
         self.implementors = resolved_implementors
         self.documenters = resolved_documenters

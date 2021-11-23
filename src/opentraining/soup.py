@@ -13,29 +13,29 @@ from networkx.exception import NetworkXError
 
 
 class Soup:
-    def __init__(self, elements=None):
+    def __init__(self, elements = None):
         self._elements = set()
         self._root_group = None
         self._worldgraph = None
 
         if elements: 
-            self.add_elements(elements)
+            for e in elements:
+                self.add_element(e)
             self.commit()
 
     def __len__(self):
         # well this is a bit dumb
-        return len(list(self._root_group.iter_recursive(userdata=None)))
+        return len(list(self._root_group.iter_recursive(userdata=self._userdata)))
 
     def add_element(self, element):
-        assert isinstance(element, Element)
+        assert isinstance(element, Element), element
         self._assert_uncommitted()
         if self._worldgraph:
             raise errors.OpenTrainingError(f'cannot add {element}: graph already made')
         self._elements.add(element)
 
-    def add_elements(self, elements):
-        for e in elements:
-            self.add_element(e)
+    def committed(self):
+        return self._root_group is not None
 
     def commit(self):
         if self._root_group is not None:
@@ -48,7 +48,7 @@ class Soup:
             title='Root', 
             path=(), 
             docname='', 
-            userdata=None,   # no associated docutils node
+            userdata=None,
         )
         self._make_hierarchy()
         self._add_nodes_to_groups()
@@ -70,7 +70,7 @@ class Soup:
                 'there were errors resolving paths of some elements', errors=errs, 
                 # don't know which thing I could refer to when doing a
                 # global resolve.
-                userdata=None,
+                userdata=self._userdata,
             )
 
         del self._elements
@@ -82,7 +82,7 @@ class Soup:
         return self._root_group
 
     def element_by_path(self, path, userdata):
-        return self._root_group.element_by_path(path, userdata)
+        return self._root_group.element_by_path(path, userdata=userdata)
 
     def worldgraph(self):
         self._assert_committed()
@@ -133,7 +133,7 @@ class Soup:
             raise errors.CompoundError('cannot build world graph', errors=collected_errors, 
                                        # don't know which thing I could refer to when doing a
                                        # global resolve.
-                                       userdata=None,
+                                       userdata=self._userdata,
                                       )
         return self._worldgraph
 
@@ -145,20 +145,20 @@ class Soup:
                 break
             level_groups = [g for g in all_groups if len(g._requested_path) == level]
             for g in level_groups:
-                self._root_group.add_element(g)
+                self._root_group.add_element(g, userdata=None)
                 self._elements.remove(g)
             level += 1
 
     def _add_nodes_to_groups(self):
         nodes = [n for n in self._elements if isinstance(n, Node)]
         for n in nodes:
-            self._root_group.add_element(n)
+            self._root_group.add_element(n, userdata=None)
             self._elements.remove(n)
             
     def _assert_committed(self):
-        if self._root_group is None:
+        if not self.committed():
             raise errors.NotCommitted('soup not committed')
 
     def _assert_uncommitted(self):
-        if self._root_group is not None:
+        if self.committed():
             raise errors.AlreadyCommitted('soup already committed')
