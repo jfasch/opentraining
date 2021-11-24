@@ -14,27 +14,23 @@ def _prepare_app(app):
     if hasattr(app, 'ot_soup'):
         raise OpenTrainingError('Soup already created, cannot add one more element')
     if not hasattr(app.env, 'ot_elements'):
-        app.env.ot_elements = {}
+        app.env.ot_elements = set()
 
 def sphinx_add_element(app, element):
     _prepare_app(app)
     assert isinstance(element, Element)
-    app.env.ot_elements[element.docname] = element
+    app.env.ot_elements.add(element)    
 
 def sphinx_purge_doc(app, env, docname):
     if hasattr(env, 'ot_elements'):
-        env.ot_elements.pop(docname, None)
+        env.ot_elements -= {e for e in env.ot_elements if e.docname == docname}
 
 def sphinx_create_soup(app):
     if hasattr(app, 'ot_soup'):
         return
 
-    app.ot_soup = Soup()
-    for element in app.env.ot_elements.values():
-        app.ot_soup.add_element(element)
-
     try:
-        app.ot_soup.commit()
+        app.ot_soup = Soup(app.env.ot_elements)
     except errors.CompoundError as e:
         for err in e:
             _logger.warning(str(err), location=err.userdata)

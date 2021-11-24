@@ -82,7 +82,7 @@ class _GraphExpander:
                 node_entries.add(entry)
                 hilit_nodes.add(entry)
             elif isinstance(entry, Group):
-                for elem in entry.iter_recursive(cls=Node, userdata=node):
+                for elem in entry.iter_recursive(cls=Node):
                     if isinstance(elem, Node):
                         node_entries.add(elem)
             else:

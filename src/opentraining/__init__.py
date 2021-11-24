@@ -3,6 +3,7 @@ from .sphinxglue import exercise
 from .sphinxglue import task
 from .sphinxglue import taskstats
 from .sphinxglue import person
+from .sphinxglue import project
 from .sphinxglue import scoretable
 from .sphinxglue import personstats
 from .sphinxglue import group
@@ -19,6 +20,7 @@ def setup(app):
     task.setup(app)
     taskstats.setup(app)
     person.setup(app)
+    project.setup(app)
     scoretable.setup(app)
     personstats.setup(app)
     group.setup(app)

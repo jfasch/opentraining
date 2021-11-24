@@ -12,7 +12,7 @@ from docutils import nodes
 
 from networkx.algorithms.dag import topological_sort
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 def setup(app):
@@ -38,7 +38,7 @@ def _ev_doctree_read__extract_groupnodes(app, doctree):
             ))
             n.replace_self([])
     except Exception:
-        logger.exception(f'{docname}: cannot extract group nodes')
+        _logger.exception(f'{docname}: cannot extract group nodes')
         raise
 
 class _GroupNode(nodes.Element):

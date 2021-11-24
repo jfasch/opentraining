@@ -22,19 +22,13 @@ def setup(app):
 
 def _ev_doctree_resolved__expand_personstats_nodes(app, doctree, docname):
     for n in doctree.traverse(_PersonStatsNode):
-        person = app.ot_soup.element_by_path(n.person, userdata=n)
-        tasks = []
-        for task in n.tasks:
-            try:
-                elem = app.ot_soup.element_by_path(task, userdata=n)
-                if isinstance(elem, Task):
-                    tasks.append(elem)
-                elif isinstance(elem, Group):
-                    tasks.extend(elem.iter_recursive(cls=Task, userdata=n))
-            except OpenTrainingError as e:
-                _logger.warning(e, location=n)
-
-        project = Project(persons = [person], tasks = tasks, userdata = n)
+        try:
+            project = app.ot_soup.element_by_path(n.project, userdata=n)
+            person = app.ot_soup.element_by_path(n.person, userdata=n)
+        except OpenTrainingError as e:
+            _logger.warning(e, location=e.userdata)
+            n.replace_self([])
+            continue
 
         table = nodes.table()
         tgroup = nodes.tgroup(cols=5)
@@ -131,25 +125,24 @@ def _ev_doctree_resolved__expand_personstats_nodes(app, doctree, docname):
         n.replace_self([table])
 
 class _PersonStatsNode(nodes.Element):
-    def __init__(self, person, tasks):
+    def __init__(self, person, project):
         super().__init__(self)
-        self.title = None
         self.person = person
-        self.tasks = tasks
+        self.project = project
 
 class _PersonStatsDirective(SphinxDirective):
     required_arguments = 1   # person
     option_spec = {
-        'tasks': utils.list_of_elementpath,
+        'project': utils.element_path,
     }
 
     def run(self):
         person = utils.element_path(self.arguments[0].strip())
-        tasks = self.options.get('tasks', [])
+        project = self.options.get('project')
 
         scores = _PersonStatsNode(
             person = person,
-            tasks = tasks,
+            project = project,
         )
 
         scores.document = self.state.document

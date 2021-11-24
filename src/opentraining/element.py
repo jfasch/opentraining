@@ -37,12 +37,12 @@ class Element:
         else:   # root group; no parent
             self.parent = None
 
-    def __str__(self):
-        c = self.committed() and 'committed' or 'uncommitted'
-        return f'{str(type(self))}({self.path},{c})'
+        # derived classes call super().resolve() which sets this
+        self._resolve_called = False
 
-    def committed(self):
-        return not hasattr(self, '_requested_path')
+    def __str__(self):
+        c = self.resolved and 'resolved' or 'unresolved'
+        return f'{str(type(self))}({self.path},{c})'
 
     @property
     def path(self):
@@ -53,17 +53,27 @@ class Element:
         else:
             return []  # root
 
-    def resolve_paths(self, soup):
-        pass
+    @property
+    def resolved(self):
+        if hasattr(self, '_requested_path'):
+            return False
+        return self._resolve_called
+
+    def resolve(self, soup):
+        assert not self._resolve_called
+        self._resolve_called = True
 
 
-def verify_is_path(path, userdata):
+def is_path(path):
     if type(path) not in (list, tuple):
-        raise errors.BadPath(f'Not a valid path: {repr(path)} is neither list nor tuple', userdata=userdata)
-        
+        return False
     for elem in path:
         if type(elem) is not str:
-            raise errors.BadPath(f'Not a valid path: {path} ({elem} is not str)', userdata=userdata)
+            return False
         if not elem.isidentifier():
-            raise errors.BadPath(f'Not a valid path: {path} ({elem} is not an identifier)', userdata=userdata)
-    
+            return False
+    return True
+
+def verify_is_path(path, userdata):
+    if not is_path(path):
+        raise errors.BadPath(f'Not a valid path: {repr(path)}', userdata=userdata)

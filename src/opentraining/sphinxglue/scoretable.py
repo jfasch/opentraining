@@ -22,28 +22,12 @@ def setup(app):
 
 def _ev_doctree_resolved__expand_scoretable_nodes(app, doctree, docname):
     for n in doctree.traverse(_ScoreTableNode):
-        persons = []
-        tasks = []
-        for person in n.persons:
-            try:
-                elem = app.ot_soup.element_by_path(person, userdata=n)
-                if isinstance(elem, Person):
-                    persons.append(elem)
-                elif isinstance(elem, Group):
-                    persons.extend(elem.iter_recursive(cls=Person, userdata=n))
-            except OpenTrainingError as e:
-                _logger.warning(e, location=n)
-        for task in n.tasks:
-            try:
-                elem = app.ot_soup.element_by_path(task, userdata=n)
-                if isinstance(elem, Task):
-                    tasks.append(elem)
-                elif isinstance(elem, Group):
-                    tasks.extend(elem.iter_recursive(cls=Task, userdata=n))
-            except OpenTrainingError as e:
-                _logger.warning(e, location=n)
-
-        project = Project(persons = persons, tasks = tasks, userdata = n)
+        try:
+            project = app.ot_soup.element_by_path(n.path, userdata=n)
+        except OpenTrainingError as e:
+            _logger.warning(e, location=e.userdata)
+            n.replace_self([])
+            continue
 
         table = nodes.table()
         tgroup = nodes.tgroup(cols=2)
@@ -91,28 +75,20 @@ def _ev_doctree_resolved__expand_scoretable_nodes(app, doctree, docname):
         n.replace_self([table])
 
 class _ScoreTableNode(nodes.Element):
-    def __init__(self, persons, tasks):
+    def __init__(self, path):
         super().__init__(self)
-        self.title = None
-        self.persons = persons
-        self.tasks = tasks
-
+        self.path = path
+        
 class _ScoreTableDirective(SphinxDirective):
-    required_arguments = 0
+    required_arguments = 1   # path
     option_spec = {
-        'persons': utils.list_of_elementpath,
-        'tasks': utils.list_of_elementpath,
+        'sort-by': utils.list_of_elementpath,
     }
 
     def run(self):
-        persons = self.options.get('persons')
-        tasks = self.options.get('tasks')
+        path = utils.element_path(self.arguments[0].strip())
 
-        scores = _ScoreTableNode(
-            persons = persons,
-            tasks = tasks,
-        )
-
+        scores = _ScoreTableNode(path = path)
         scores.document = self.state.document
         set_source_info(self, scores)
 

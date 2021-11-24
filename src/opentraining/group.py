@@ -1,5 +1,5 @@
 from . import errors
-from .element import Element
+from .element import Element, verify_is_path
 from .node import Node
 
 
@@ -35,6 +35,8 @@ class Group(Element):
 
     def element_by_path(self, path, userdata):
         '''Get element by path. path is relative to this group.'''
+        
+        verify_is_path(path, userdata)
 
         element = self._children.get(path[0])
         if element is None:
@@ -70,18 +72,18 @@ class Group(Element):
                 return True
         return False
 
-    def iter_recursive(self, userdata, cls=None):
+    def iter_recursive(self, cls=None):
         '''Iterator (name, element) over descendants, recursively'''
         if cls:
-            if not issubclass(cls, Element):
-                raise errors.OpenTrainingError(f'{cls} is not a subclass of {Element}', userdata)
+            assert issubclass(cls, Element)
         else:
             cls = Element
 
+        if issubclass(Group, cls):
+            yield self
+
         for name, elem in self._children.items():
             if isinstance(elem, Group):
-                if cls is Group:
-                    yield elem
-                yield from elem.iter_recursive(userdata, cls)
+                yield from elem.iter_recursive(cls)
             elif isinstance(elem, cls):
                 yield elem

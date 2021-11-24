@@ -13,35 +13,22 @@ from networkx.exception import NetworkXError
 
 
 class Soup:
-    def __init__(self, elements = None):
-        self._elements = set()
+    def __init__(self, elements):
         self._root_group = None
         self._worldgraph = None
 
-        if elements: 
-            for e in elements:
-                self.add_element(e)
-            self.commit()
+        self._elements = set(elements)
+        for e in self._elements:
+            assert isinstance(e, Element), e
+        self._resolve()
 
-    def __len__(self):
-        # well this is a bit dumb
-        return len(list(self._root_group.iter_recursive(userdata=self._userdata)))
-
-    def add_element(self, element):
-        assert isinstance(element, Element), element
-        self._assert_uncommitted()
-        if self._worldgraph:
-            raise errors.OpenTrainingError(f'cannot add {element}: graph already made')
-        self._elements.add(element)
-
-    def committed(self):
+    @property
+    def resolved(self):
         return self._root_group is not None
 
-    def commit(self):
+    def _resolve(self):
         if self._root_group is not None:
             return
-
-        elements_to_resolve = list(self._elements)
 
         # build up hierarchy (thereby emptying self._elements)
         self._root_group = Group(
@@ -57,11 +44,11 @@ class Soup:
         # once the elements have paths in their final hierarchy, we
         # can let them resolve their own stuff. for example, a task
         # initially refers to a person's *path* - final situation
-        # should be though that a task refers to the person directly.
+        # should be that a task refers to the Person object directly.
         errs = []
-        for element in elements_to_resolve:
+        for element in self._root_group.iter_recursive():
             try:
-                element.resolve_paths(self)
+                element.resolve(self)
             except errors.OpenTrainingError as e:
                 errs.append(e)
 
@@ -84,8 +71,11 @@ class Soup:
     def element_by_path(self, path, userdata):
         return self._root_group.element_by_path(path, userdata=userdata)
 
+    def __iter__(self):
+        return self._root_group.iter_recursive()
+
     def worldgraph(self):
-        self._assert_committed()
+        self._assert_resolved()
         return self._make_worldgraph()
 
     def subgraph(self, entrypoints, userdata):
@@ -100,7 +90,7 @@ class Soup:
         for e in entrypoints:
             assert isinstance(e, Element)
 
-        self._assert_committed()
+        self._assert_resolved()
         world = self._make_worldgraph()
 
         topics = set()
@@ -115,7 +105,7 @@ class Soup:
 
         collected_errors = []
         self._worldgraph = DiGraph()
-        for elem in self._root_group.iter_recursive(cls=Node, userdata=None):
+        for elem in self._root_group.iter_recursive(cls=Node):
             if not isinstance(elem, Node):
                 continue
             self._worldgraph.add_node(elem)
@@ -150,15 +140,15 @@ class Soup:
             level += 1
 
     def _add_nodes_to_groups(self):
-        nodes = [n for n in self._elements if isinstance(n, Node)]
+        nodes = [n for n in self._elements if isinstance(n, Element)]
         for n in nodes:
             self._root_group.add_element(n, userdata=None)
             self._elements.remove(n)
             
-    def _assert_committed(self):
-        if not self.committed():
-            raise errors.NotCommitted('soup not committed')
+    def _assert_resolved(self):
+        if not self.resolved:
+            raise errors.NotCommitted('soup not resolved')
 
-    def _assert_uncommitted(self):
-        if self.committed():
-            raise errors.AlreadyCommitted('soup already committed')
+    def _assert_unresolved(self):
+        if self.resolved:
+            raise errors.AlreadyCommitted('soup already resolved')

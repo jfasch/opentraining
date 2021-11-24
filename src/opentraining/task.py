@@ -42,9 +42,7 @@ class Task(Node):
         self.documenters = documenters
         self.integrators = integrators
 
-        self.resolved = False
-
-    def resolve_paths(self, soup):
+    def resolve(self, soup):
         errs = []
         resolved_implementors = []
         resolved_documenters = []
@@ -76,7 +74,7 @@ class Task(Node):
         self.documenters = resolved_documenters
         self.integrators = resolved_integrators
 
-        self.resolved = True
+        super().resolve(soup)
 
     def person_implementation_score(self, person):
         return self._person_score(person, self.IMPLEMENTATION)

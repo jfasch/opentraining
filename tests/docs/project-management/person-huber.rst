@@ -6,4 +6,4 @@ Sepp Huber
 ==========
 
 .. ot-personstats:: opentraining.tests.project_management.person_huber
-   :tasks: opentraining.tests.project_management
+   :project: opentraining.tests.project_management.project
