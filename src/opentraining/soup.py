@@ -14,32 +14,18 @@ from networkx.exception import NetworkXError
 
 class Soup:
     def __init__(self, elements):
-        self._root_group = None
-        self._worldgraph = None
-
-        self._elements = set(elements)
-        for e in self._elements:
-            assert isinstance(e, Element), e
-        self._resolve()
-
-    @property
-    def resolved(self):
-        return self._root_group is not None
-
-    def _resolve(self):
-        if self._root_group is not None:
-            return
-
-        # build up hierarchy (thereby emptying self._elements)
         self._root_group = Group(
             title='Root', 
             path=(), 
             docname='', 
             userdata=None,
         )
-        self._make_hierarchy()
-        self._add_nodes_to_groups()
-        assert len(self._elements) == 0, self._elements
+
+        # build group hierarchy, and throw in remaining elements.
+        my_elements = set(elements)
+        self._make_hierarchy(self._root_group, my_elements)
+        self._add_nodes_to_groups(self._root_group, my_elements)
+        assert len(my_elements) == 0, my_elements
 
         # once the elements have paths in their final hierarchy, we
         # can let them resolve their own stuff. for example, a task
@@ -60,9 +46,13 @@ class Soup:
                 userdata=None,
             )
 
-        del self._elements
-        self.worldgraph()    # only to detect missing dependencies
-                             # early
+        # finally, create graph
+        self._worldgraph = self._make_worldgraph(self._root_group)
+
+
+    @property
+    def resolved(self):
+        return self._root_group is not None
 
     @property
     def root(self):
@@ -75,8 +65,7 @@ class Soup:
         return self._root_group.iter_recursive()
 
     def worldgraph(self):
-        self._assert_resolved()
-        return self._make_worldgraph()
+        return self._worldgraph
 
     def subgraph(self, entrypoints, userdata):
         '''Given entrypoints, compute a subgraph of the world graph that
@@ -90,29 +79,45 @@ class Soup:
         for e in entrypoints:
             assert isinstance(e, Element)
 
-        self._assert_resolved()
-        world = self._make_worldgraph()
-
         topics = set()
         for topic in entrypoints:
             topics.add(topic)
-            topics.update(descendants(world, topic))
-        return world.subgraph(topics)
+            topics.update(descendants(self._worldgraph, topic))
+        return self._worldgraph.subgraph(topics)
 
-    def _make_worldgraph(self):
-        if self._worldgraph is not None:
-            return self._worldgraph
+    @classmethod
+    def _make_hierarchy(cls, root, elements):
+        level = 1
+        while True:
+            all_groups = [g for g in elements if isinstance(g, Group)]
+            if not all_groups:   # no more groups
+                break
+            level_groups = [g for g in all_groups if len(g._requested_path) == level]
+            for g in level_groups:
+                root.add_element(g, userdata=None)
+                elements.remove(g)
+            level += 1
 
+    @classmethod
+    def _add_nodes_to_groups(cls, root, elements):
+        nodes = [n for n in elements if isinstance(n, Element)]
+        for n in nodes:
+            root.add_element(n, userdata=None)
+            elements.remove(n)
+
+    @classmethod
+    def _make_worldgraph(cls, root):
+        worldgraph = DiGraph()
         collected_errors = []
-        self._worldgraph = DiGraph()
-        for elem in self._root_group.iter_recursive(cls=Node):
+
+        for elem in root.iter_recursive(cls=Node):
             if not isinstance(elem, Node):
                 continue
-            self._worldgraph.add_node(elem)
+            worldgraph.add_node(elem)
             for target_path in elem.dependencies:
                 try:
-                    target_topic = self.element_by_path(target_path, userdata=elem.userdata)
-                    self._worldgraph.add_edge(elem, target_topic)
+                    target_topic = root.element_by_path(target_path, userdata=elem.userdata)
+                    worldgraph.add_edge(elem, target_topic)
                 except errors.PathNotFound as e:
                     collected_errors.append(
                         errors.DependencyError(
@@ -124,26 +129,9 @@ class Soup:
                                        # don't know which thing I could refer to when doing a
                                        # global resolve.
                                        userdata=None,
-                                      )
-        return self._worldgraph
+                                       )
+        return worldgraph
 
-    def _make_hierarchy(self):
-        level = 1
-        while True:
-            all_groups = [g for g in self._elements if isinstance(g, Group)]
-            if not all_groups:   # no more groups
-                break
-            level_groups = [g for g in all_groups if len(g._requested_path) == level]
-            for g in level_groups:
-                self._root_group.add_element(g, userdata=None)
-                self._elements.remove(g)
-            level += 1
-
-    def _add_nodes_to_groups(self):
-        nodes = [n for n in self._elements if isinstance(n, Element)]
-        for n in nodes:
-            self._root_group.add_element(n, userdata=None)
-            self._elements.remove(n)
             
     def _assert_resolved(self):
         if not self.resolved:
