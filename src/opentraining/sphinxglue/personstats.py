@@ -137,15 +137,20 @@ class _PersonStatsDirective(SphinxDirective):
     }
 
     def run(self):
+        document = self.state.document
+
         person = utils.element_path(self.arguments[0].strip())
         project = self.options.get('project')
+
+        if not project:
+            return [document.reporter.warning('"project" option missing', line=self.lineno)]
 
         scores = _PersonStatsNode(
             person = person,
             project = project,
         )
 
-        scores.document = self.state.document
+        scores.document = document
         set_source_info(self, scores)
 
         return [scores]
