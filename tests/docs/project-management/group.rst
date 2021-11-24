@@ -25,6 +25,15 @@ Score Table
 
 .. ot-scoretable:: opentraining.tests.project_management.project
 
+Task Table
+..........
+
+.. code-block:: rst
+
+   .. ot-tasktable:: opentraining.tests.project_management.project
+
+.. ot-tasktable:: opentraining.tests.project_management.project
+
 Project Definition (Tasks and Persons Enumerated Explicitly)
 ------------------------------------------------------------
 

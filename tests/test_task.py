@@ -73,3 +73,28 @@ def test_task_resolve_hints(_my_project):
     assert _my_project.task.documenters == [(_my_project.documenter, 100)]
     assert _my_project.task.integrators == [(_my_project.integrator, 100)]
 
+def test_stats():
+    task = Task(
+        title=None,
+        path=['blah', 'task'],
+        docname=None, 
+        dependencies=[],
+        userdata=None,
+        
+        implementation_points=70, 
+        implementors=[(['implementor1'], 30), (['implementor2'], 20)],
+        documentation_points=30, 
+        documenters=[(['documenter'], 30)],
+        integration_points=90, 
+        integrators=[(['integrator'], 10)],
+    )
+
+    implementation_percent, documentation_percent, integration_percent, total_percent = task.stats()
+    assert implementation_percent == 30+20
+    assert documentation_percent == 30
+    assert integration_percent == 10
+
+    total_points = 70+30+90
+    gathered_points = 70*(30+20)/100 + 30*30/100 + 90*10/100
+
+    assert total_percent == pytest.approx(gathered_points/total_points*100)

@@ -2,9 +2,9 @@
    :implementation-points: 50
    :documentation-points: 60
    :integration-points: 10
-   :implementors: opentraining.tests.project_management.person_huber:100
-   :documenters: opentraining.tests.project_management.person_queen:100
-   :integrators: opentraining.tests.project_management.person_huber:100
+   :implementors: opentraining.tests.project_management.person_huber:50
+   :documenters: opentraining.tests.project_management.person_queen:50
+   :integrators: opentraining.tests.project_management.person_huber:50
 
 
 Lo Task

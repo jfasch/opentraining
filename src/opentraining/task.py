@@ -42,6 +42,19 @@ class Task(Node):
         self.documenters = documenters
         self.integrators = integrators
 
+    def stats(self):
+        implementation_percent = sum(percent for _,percent in self.implementors)
+        documentation_percent = sum(percent for _,percent in self.documenters)
+        integration_percent = sum(percent for _,percent in self.integrators)
+
+        total_points = sum((self.implementation_points, self.documentation_points, self.integration_points))
+        gathered_points = sum((self.implementation_points * implementation_percent/100,
+                               self.documentation_points * documentation_percent/100,
+                               self.integration_points * integration_percent/100))
+        total_percent = gathered_points / total_points * 100
+
+        return implementation_percent, documentation_percent, integration_percent, total_percent
+
     def resolve(self, soup):
         errs = []
         resolved_implementors = []
