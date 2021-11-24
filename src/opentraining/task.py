@@ -51,7 +51,10 @@ class Task(Node):
         gathered_points = sum((self.implementation_points * implementation_percent/100,
                                self.documentation_points * documentation_percent/100,
                                self.integration_points * integration_percent/100))
-        total_percent = gathered_points / total_points * 100
+        if total_points == 0:
+            total_percent = 0.0
+        else:
+            total_percent = gathered_points / total_points * 100
 
         return implementation_percent, documentation_percent, integration_percent, total_percent
 

@@ -34,12 +34,12 @@ def _ev_doctree_resolved__expand_tasktable_nodes(app, doctree, docname):
         table += tgroup
         tgroup += nodes.colspec(colwidth=8)
         tgroup += nodes.colspec(colwidth=4)
+        tgroup += nodes.colspec(colwidth=1)
         tgroup += nodes.colspec(colwidth=4)
+        tgroup += nodes.colspec(colwidth=1)
         tgroup += nodes.colspec(colwidth=4)
-        tgroup += nodes.colspec(colwidth=4)
-        tgroup += nodes.colspec(colwidth=4)
-        tgroup += nodes.colspec(colwidth=4)
-        tgroup += nodes.colspec(colwidth=4)
+        tgroup += nodes.colspec(colwidth=1)
+        tgroup += nodes.colspec(colwidth=2)
 
         if 'thead':
             thead = nodes.thead()

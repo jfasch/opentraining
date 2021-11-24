@@ -76,9 +76,9 @@ class _TaskDirective(SphinxDirective):
         path = utils.element_path(self.arguments[0].strip())
         dependencies = self.options.get('dependencies', [])
 
-        implementation_points = self.options.get('implementation-points')
-        documentation_points = self.options.get('documentation-points')
-        integration_points = self.options.get('integration-points')
+        implementation_points = self.options.get('implementation-points', 0)
+        documentation_points = self.options.get('documentation-points', 0)
+        integration_points = self.options.get('integration-points', 0)
         implementors = self.options.get('implementors', [])
         documenters = self.options.get('documenters', [])
         integrators = self.options.get('integrators', [])

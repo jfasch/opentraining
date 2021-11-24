@@ -55,21 +55,21 @@ def _ev_doctree_resolved__expand_taskstats_nodes(app, doctree, docname):
             entry += nodes.Text(f'Implementation')
             entry = nodes.entry()
             row2 += entry
-            entry += nodes.Text(f'(Difficulty: {task.implementation_points})')
+            entry += nodes.Text(f'(Points: {task.implementation_points})')
 
             entry = nodes.entry()
             row1 += entry
             entry += nodes.Text(f'Documentation')
             entry = nodes.entry()
             row2 += entry
-            entry += nodes.Text(f'(Difficulty: {task.documentation_points})')
+            entry += nodes.Text(f'(Points: {task.documentation_points})')
 
             entry = nodes.entry()
             row1 += entry
             entry += nodes.Text(f'Integration')
             entry = nodes.entry()
             row2 += entry
-            entry += nodes.Text(f'(Difficulty: {task.integration_points})')
+            entry += nodes.Text(f'(Points: {task.integration_points})')
 
         if 'tbody':
             tbody = nodes.tbody()
