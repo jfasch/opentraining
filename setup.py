@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='opentraining',
-    version='0.6.0',
+    version='0.6.1',
     description='A set of Sphinx extensions to manage training material',
 
     # long_description='blah',
