@@ -1,7 +1,8 @@
 from collections import defaultdict
+import itertools
 
 
-class Grading:
+class Project:
 
     def __init__(self, persons, tasks, userdata):
         self.persons = persons
@@ -43,3 +44,12 @@ class Grading:
                     score += task.integration_points * share
 
         return score
+
+    def tasks_of_person(self, person):
+        assert person in self.persons
+
+        her_tasks = set()
+        for task in self.tasks:
+            if person in (p for p,_ in itertools.chain(task.implementors, task.documenters, task.integrators)):
+                her_tasks.add(task)
+        return her_tasks

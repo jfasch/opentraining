@@ -1,9 +1,9 @@
 .. ot-person:: opentraining.tests.project_management.person_faschingbauer
-   :firstname: Joerg
+   :firstname: Jörg
    :lastname: Faschingbauer
 
 Jörg Faschingbauer
 ==================
 
-.. .. ot-personstats:: opentraining.tests.project_management.person_faschingbauer
-   
+.. ot-personstats:: opentraining.tests.project_management.person_faschingbauer
+   :tasks: opentraining.tests.project_management

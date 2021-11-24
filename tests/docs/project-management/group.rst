@@ -26,7 +26,6 @@ Score Table: Explicit
 	     opentraining.tests.project_management.person_queen
    :tasks: opentraining.tests.project_management.task_lo,
 	   opentraining.tests.project_management.task_hi
-   :shape: table
 	     
 Score Table: Implicit (Persons and Tasks by Group)
 ..................................................
@@ -34,7 +33,6 @@ Score Table: Implicit (Persons and Tasks by Group)
 .. ot-scoretable::
    :persons: opentraining.tests.project_management
    :tasks: opentraining.tests.project_management
-   :shape: table
 
 Dependencies
 ------------

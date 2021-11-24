@@ -1,11 +1,11 @@
 .. ot-task:: opentraining.tests.project_management.task_lo
-   :implementation-points: 100
+   :implementation-points: 50
+   :documentation-points: 60
+   :integration-points: 10
    :implementors: opentraining.tests.project_management.person_huber:100
-   :documentation-points: 10
    :documenters: opentraining.tests.project_management.person_queen:100
-   :integration-points: 50
-   :integrators: opentraining.tests.project_management.person_queen:50, 
-		 opentraining.tests.project_management.person_huber:50
+   :integrators: opentraining.tests.project_management.person_huber:100
+
 
 Lo Task
 =======
@@ -13,6 +13,6 @@ Lo Task
 Task Metadata
 -------------
 
-``ot-taskmeta``
+``ot-taskstats``
 
-.. ot-taskmeta:: opentraining.tests.project_management.task_lo
+.. ot-taskstats:: opentraining.tests.project_management.task_lo

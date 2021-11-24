@@ -4,6 +4,8 @@ from . import errors
 
 
 class Task(Node):
+    IMPLEMENTATION, DOCUMENTATION, INTEGRATION = range(3)
+
     def __init__(self, 
                  title, path, docname, 
                  dependencies, userdata,
@@ -40,6 +42,8 @@ class Task(Node):
         self.documenters = documenters
         self.integrators = integrators
 
+        self.resolved = False
+
     def resolve_paths(self, soup):
         errs = []
         resolved_implementors = []
@@ -71,3 +75,33 @@ class Task(Node):
         self.implementors = resolved_implementors
         self.documenters = resolved_documenters
         self.integrators = resolved_integrators
+
+        self.resolved = True
+
+    def person_implementation_score(self, person):
+        return self._person_score(person, self.IMPLEMENTATION)
+    def person_documentation_score(self, person):
+        return self._person_score(person, self.DOCUMENTATION)
+    def person_integration_score(self, person):
+        return self._person_score(person, self.INTEGRATION)
+
+    def _person_score(self, person, what):
+        assert self.resolved
+
+        if what == self.IMPLEMENTATION:
+            workers = self.implementors
+            difficulty = self.implementation_points
+        elif what == self.DOCUMENTATION:
+            workers = self.documenters
+            difficulty = self.documentation_points
+        elif what == self.INTEGRATION:
+            workers = self.integrators
+            difficulty = self.integration_points
+        else: assert False, what
+
+        score = 0
+        for p, share in workers:
+            if person is p:
+                score += share * difficulty
+        return score
+        

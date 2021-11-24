@@ -1,9 +1,10 @@
 from .sphinxglue import topic
 from .sphinxglue import exercise
 from .sphinxglue import task
-from .sphinxglue import taskmeta
+from .sphinxglue import taskstats
 from .sphinxglue import person
-from .sphinxglue import grading
+from .sphinxglue import scoretable
+from .sphinxglue import personstats
 from .sphinxglue import group
 from .sphinxglue import grouplist
 from .sphinxglue import graph
@@ -16,12 +17,11 @@ def setup(app):
     topic.setup(app)
     exercise.setup(app)
     task.setup(app)
-    taskmeta.setup(app)
+    taskstats.setup(app)
     person.setup(app)
-    grading.setup(app)
+    scoretable.setup(app)
+    personstats.setup(app)
     group.setup(app)
     grouplist.setup(app)
     graph.setup(app)
     dia.setup(app)
-
-

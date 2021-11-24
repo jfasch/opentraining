@@ -1,6 +1,6 @@
 from . import utils
 from . import soup
-from ..grading import Grading
+from ..project import Project
 from ..person import Person
 from ..task import Task
 from ..group import Group
@@ -43,7 +43,7 @@ def _ev_doctree_resolved__expand_scoretable_nodes(app, doctree, docname):
             except OpenTrainingError as e:
                 _logger.warning(e, location=n)
 
-        grading = Grading(persons = persons, tasks = tasks, userdata = n)
+        project = Project(persons = persons, tasks = tasks, userdata = n)
 
         table = nodes.table()
         tgroup = nodes.tgroup(cols=2)
@@ -66,7 +66,7 @@ def _ev_doctree_resolved__expand_scoretable_nodes(app, doctree, docname):
         tbody = nodes.tbody()
         tgroup += tbody
 
-        for person, points in sorted(grading.score_table(), key=lambda elem: (elem[0].lastname, elem[0].firstname)):
+        for person, points in sorted(project.score_table(), key=lambda elem: (elem[0].lastname, elem[0].firstname)):
             row = nodes.row()
             tbody += row
 
@@ -91,34 +91,26 @@ def _ev_doctree_resolved__expand_scoretable_nodes(app, doctree, docname):
         n.replace_self([table])
 
 class _ScoreTableNode(nodes.Element):
-    def __init__(self, persons, tasks, shape):
+    def __init__(self, persons, tasks):
         super().__init__(self)
         self.title = None
         self.persons = persons
         self.tasks = tasks
-        self.shape = shape
-
-
-def _table_or_list(argument):
-    return directives.choice(argument, ('table', 'list'))
 
 class _ScoreTableDirective(SphinxDirective):
     required_arguments = 0
     option_spec = {
         'persons': utils.list_of_elementpath,
         'tasks': utils.list_of_elementpath,
-        'shape': _table_or_list,
     }
 
     def run(self):
         persons = self.options.get('persons')
         tasks = self.options.get('tasks')
-        shape = self.options.get('shape', 'list')
 
         scores = _ScoreTableNode(
             persons = persons,
             tasks = tasks,
-            shape = shape,
         )
 
         scores.document = self.state.document

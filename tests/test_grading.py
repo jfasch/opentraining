@@ -1,7 +1,7 @@
 from opentraining.person import Person
 from opentraining.task import Task
 from opentraining.soup import Soup
-from opentraining.grading import Grading
+from opentraining.project import Project
 from opentraining import errors 
 
 import pytest
@@ -10,7 +10,7 @@ from collections import namedtuple
 import sys
 
 
-_Project = namedtuple('_Project', ('faschingbauer', 'huber', 'queen', 'task_hi', 'task_lo', 'soup', 'grading'))
+_Project = namedtuple('_Project', ('faschingbauer', 'huber', 'queen', 'task_hi', 'task_lo', 'soup', 'project'))
 
 def _p():
     faschingbauer = Person(
@@ -75,8 +75,9 @@ def _p():
         task_hi = task_hi,
         task_lo = task_lo,
         soup = Soup((queen, huber, faschingbauer, task_lo, task_hi)),
-        grading = Grading(persons = (faschingbauer, huber, queen),
-                          tasks = (task_hi, task_lo)),
+        project = Project(persons = (faschingbauer, huber, queen),
+                          tasks = (task_hi, task_lo), 
+                          userdata = None),
     )
 
 if __name__ == '__main__':
@@ -91,10 +92,13 @@ if __name__ == '__main__':
 _p = pytest.fixture(_p)
 
 def test_person_score(_p):
-    assert _p.grading.person_score(_p.faschingbauer) == 70 * 100 # task_hi only
+    assert _p.project.person_score(_p.faschingbauer) == 70 * 100 # task_hi only
 
 def test_score_table(_p):
-    st = {person: score for person, score in _p.grading.score_table()}
+    st = {person: score for person, score in _p.project.score_table()}
     assert st[_p.faschingbauer] == 70*100
     assert st[_p.huber] == 90*100 + 50*100 + 10*100
     assert st[_p.queen] == 50*100 + 60*100
+
+def test_tasks_of_person(_p):
+    assert sorted(_p.project.tasks_of_person(_p.faschingbauer)) == sorted((_p.task_hi,))

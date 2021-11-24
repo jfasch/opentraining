@@ -1,8 +1,12 @@
 .. ot-task:: opentraining.tests.project_management.task_hi
-   :implementation-points: 60
-   :documentation-points: 40
-   :integration-points: 70
+   :implementation-points: 70
+   :documentation-points: 50
+   :integration-points: 90
+   :implementors: opentraining.tests.project_management.person_faschingbauer:100
+   :documenters: opentraining.tests.project_management.person_queen:100
+   :integrators: opentraining.tests.project_management.person_huber:100
    :dependencies: opentraining.tests.project_management.task_lo
+
 
 Hi Task
 =======
@@ -10,6 +14,6 @@ Hi Task
 Task Metadata
 -------------
 
-``ot-taskmeta``
+``ot-taskstats``
 
-.. ot-taskmeta:: opentraining.tests.project_management.task_hi
+.. ot-taskstats:: opentraining.tests.project_management.task_hi
