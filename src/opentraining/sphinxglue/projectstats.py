@@ -17,13 +17,13 @@ _logger = logging.getLogger(__name__)
 
 
 def setup(app):
-    app.add_directive('ot-tasktable', _TaskTableDirective)
-    app.connect('doctree-resolved', _ev_doctree_resolved__expand_tasktable_nodes)
+    app.add_directive('ot-projectstats', _ProjectStatsDirective)
+    app.connect('doctree-resolved', _ev_doctree_resolved__expand_projectstats_nodes)
 
-def _ev_doctree_resolved__expand_tasktable_nodes(app, doctree, docname):
-    for n in doctree.traverse(_TaskTableNode):
+def _ev_doctree_resolved__expand_projectstats_nodes(app, doctree, docname):
+    for n in doctree.traverse(_ProjectStatsNode):
         try:
-            project = app.ot_soup.element_by_path(n.path, userdata=n)
+            project = app.ot_soup.element_by_path(n.project, userdata=n)
         except OpenTrainingError as e:
             _logger.warning(e, location=e.userdata)
             n.replace_self([])
@@ -83,7 +83,22 @@ def _ev_doctree_resolved__expand_tasktable_nodes(app, doctree, docname):
             tbody = nodes.tbody()
             tgroup += tbody
 
-            for task in project.tasks:
+            stats = project.stats()
+            if n.sort_by == 'title': 
+                key=lambda s: s[0].title
+            elif n.sort_by == 'percent-total':
+                key=lambda s: s[4]
+            else:
+                assert False, 'unknown sort_by: '+sort_by
+
+            if n.sort_order == 'ascending':
+                reverse = False
+            elif n.sort_order == 'descending':
+                reverse = True
+            else:
+                assert False, 'unknown sort_order: '+sort_order
+
+            for task, implementation_percent, documentation_percent, integration_percent, total_percent in sorted(stats, key=key, reverse=reverse):
                 row = nodes.row()
                 tbody += row
 
@@ -95,8 +110,6 @@ def _ev_doctree_resolved__expand_tasktable_nodes(app, doctree, docname):
                 p += [utils.make_reference(text=task.title,
                                            from_docname=docname, to_docname=task.docname,
                                            app=app)]
-
-                implementation_percent, documentation_percent, integration_percent, total_percent = task.stats()
 
                 # implementation
                 entry = nodes.entry()
@@ -132,21 +145,30 @@ def _ev_doctree_resolved__expand_tasktable_nodes(app, doctree, docname):
 
         n.replace_self([table])
 
-class _TaskTableNode(nodes.Element):
-    def __init__(self, path):
+class _ProjectStatsNode(nodes.Element):
+    def __init__(self, project, sort_by, sort_order):
         super().__init__(self)
-        self.path = path
-        
-class _TaskTableDirective(SphinxDirective):
+        self.project = project
+        self.sort_by = sort_by
+        self.sort_order = sort_order
+
+class _ProjectStatsDirective(SphinxDirective):
     required_arguments = 1   # path
     option_spec = {
-        'sort-by': utils.list_of_elementpath,
+        'sort-by': lambda argument: directives.choice(argument, ('title', 'percent-total')),
+        'sort-order': lambda argument: directives.choice(argument, ('ascending', 'descending')),
     }
 
     def run(self):
-        path = utils.element_path(self.arguments[0].strip())
+        project = utils.element_path(self.arguments[0].strip())
 
-        tasks = _TaskTableNode(path = path)
+        sort_by = self.options.get('sort-by', 'title')
+        sort_order = self.options.get('sort-order', 'ascending')
+
+        tasks = _ProjectStatsNode(
+            project = project, 
+            sort_by = sort_by, 
+            sort_order = sort_order)
         tasks.document = self.state.document
         set_source_info(self, tasks)
 

@@ -1,7 +1,10 @@
+.. ot-group:: opentraining.tests.project_management
+
 Project Management
 ==================
 
-.. ot-group:: opentraining.tests.project_management
+.. contents::
+   :local:
 
 Project Definition (Tasks and Persons by Group)
 -----------------------------------------------
@@ -15,24 +18,6 @@ Project Definition (Tasks and Persons by Group)
 .. ot-project:: opentraining.tests.project_management.project
    :persons: opentraining.tests.project_management
    :tasks: opentraining.tests.project_management
-
-Score Table
-...........
-
-.. code-block:: rst
-
-   .. ot-scoretable:: opentraining.tests.project_management.project
-
-.. ot-scoretable:: opentraining.tests.project_management.project
-
-Task Table
-..........
-
-.. code-block:: rst
-
-   .. ot-tasktable:: opentraining.tests.project_management.project
-
-.. ot-tasktable:: opentraining.tests.project_management.project
 
 Project Definition (Tasks and Persons Enumerated Explicitly)
 ------------------------------------------------------------
@@ -52,6 +37,48 @@ Project Definition (Tasks and Persons Enumerated Explicitly)
 	     opentraining.tests.project_management.person_queen
    :tasks: opentraining.tests.project_management.task_lo,
 	   opentraining.tests.project_management.task_hi
+
+Score Table
+...........
+
+.. code-block:: rst
+
+   .. ot-scoretable:: opentraining.tests.project_management.project
+
+.. ot-scoretable:: opentraining.tests.project_management.project
+
+Project  Stats (Default: By Title, Ascending)
+.............................................
+
+.. code-block:: rst
+
+   .. ot-projectstats:: opentraining.tests.project_management.project
+
+.. ot-projectstats:: opentraining.tests.project_management.project
+
+Project Stats (By Title (Default), Descending)
+..............................................
+
+.. code-block:: rst
+
+   .. ot-projectstats:: opentraining.tests.project_management.project
+      :sort-order: descending
+
+.. ot-projectstats:: opentraining.tests.project_management.project
+   :sort-order: descending
+
+Project Stats (By Percent-Total, Descending)
+............................................
+
+.. code-block:: rst
+
+   .. ot-projectstats:: opentraining.tests.project_management.project
+      :sort-by: percent-total
+      :sort-order: descending
+
+.. ot-projectstats:: opentraining.tests.project_management.project
+      :sort-by: percent-total
+      :sort-order: descending
 
 Score Table
 ...........

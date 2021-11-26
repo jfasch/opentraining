@@ -65,6 +65,10 @@ class Project(Element):
                 her_tasks.add(task)
         return her_tasks
 
+    def stats(self):
+        for task in self.tasks:
+            yield (task,) + task.stats()
+
     def resolve(self, soup):
         persons = []
         tasks = []

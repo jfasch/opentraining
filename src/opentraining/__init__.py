@@ -4,8 +4,8 @@ from .sphinxglue import task
 from .sphinxglue import taskstats
 from .sphinxglue import person
 from .sphinxglue import project
+from .sphinxglue import projectstats
 from .sphinxglue import scoretable
-from .sphinxglue import tasktable
 from .sphinxglue import personstats
 from .sphinxglue import group
 from .sphinxglue import grouplist
@@ -22,8 +22,8 @@ def setup(app):
     taskstats.setup(app)
     person.setup(app)
     project.setup(app)
+    projectstats.setup(app)
     scoretable.setup(app)
-    tasktable.setup(app)
     personstats.setup(app)
     group.setup(app)
     grouplist.setup(app)

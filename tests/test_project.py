@@ -39,7 +39,7 @@ def _f():
     )
 
     task_hi = Task(
-        title=None,
+        title='hi',
         path=['task_hi'],
         docname=None, 
         dependencies=[['task_lo']],
@@ -53,7 +53,7 @@ def _f():
         integrators=[(['huber'], 100)],
     )
     task_lo = Task(
-        title=None,
+        title='lo',
         path=['task_lo'],
         docname=None, 
         dependencies=[],
@@ -145,3 +145,8 @@ def test_score_table(_f):
 
 def test_tasks_of_person(_f):
     assert sorted(_f.project.tasks_of_person(_f.faschingbauer)) == sorted((_f.task_hi,))
+
+def test_stats(_f):
+    assert len(list(_f.project.stats())) == 2
+    for task, implementation_percent, documentation_percent, integration_percent, total_percent in _f.project.stats():
+        assert (implementation_percent, documentation_percent, integration_percent, total_percent) == task.stats()
