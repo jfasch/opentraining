@@ -77,7 +77,7 @@ def _ev_doctree_resolved__expand_projectstats_nodes(app, doctree, docname):
 
             entry = nodes.entry()
             row += entry
-            entry += nodes.Text('Total %')
+            entry += nodes.Text('% Total')
 
         if 'tbody':
             tbody = nodes.tbody()
@@ -118,7 +118,7 @@ def _ev_doctree_resolved__expand_projectstats_nodes(app, doctree, docname):
 
                 entry = nodes.entry()
                 row += entry
-                entry += nodes.Text(str(implementation_percent))
+                entry += nodes.Text(str(round(implementation_percent, 2)))
 
                 # documentation
                 entry = nodes.entry()
@@ -127,7 +127,7 @@ def _ev_doctree_resolved__expand_projectstats_nodes(app, doctree, docname):
 
                 entry = nodes.entry()
                 row += entry
-                entry += nodes.Text(str(documentation_percent))
+                entry += nodes.Text(str(round(documentation_percent, 2)))
 
                 # integration
                 entry = nodes.entry()
@@ -136,12 +136,12 @@ def _ev_doctree_resolved__expand_projectstats_nodes(app, doctree, docname):
 
                 entry = nodes.entry()
                 row += entry
-                entry += nodes.Text(str(integration_percent))
+                entry += nodes.Text(str(round(integration_percent, 2)))
 
                 # total
                 entry = nodes.entry()
                 row += entry
-                entry += nodes.Text(str(total_percent))
+                entry += nodes.Text(str(round(total_percent, 2)))
 
         n.replace_self([table])
 
