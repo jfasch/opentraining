@@ -92,14 +92,14 @@ class Task(Node):
 
         super().resolve(soup)
 
-    def person_implementation_score(self, person):
-        return self._person_score(person, self.IMPLEMENTATION)
-    def person_documentation_score(self, person):
-        return self._person_score(person, self.DOCUMENTATION)
-    def person_integration_score(self, person):
-        return self._person_score(person, self.INTEGRATION)
+    def person_implementation_points(self, person):
+        return self._person_points(person, self.IMPLEMENTATION)
+    def person_documentation_points(self, person):
+        return self._person_points(person, self.DOCUMENTATION)
+    def person_integration_points(self, person):
+        return self._person_points(person, self.INTEGRATION)
 
-    def _person_score(self, person, what):
+    def _person_points(self, person, what):
         assert self.resolved
 
         if what == self.IMPLEMENTATION:

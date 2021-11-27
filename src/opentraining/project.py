@@ -15,44 +15,20 @@ class Project(Element):
         self.persons = persons
         self.tasks = tasks
 
-    def score_table(self):
-        'Return iterable of (person, points)'
-        assert self.resolved
-
-        points_per_person = defaultdict(int)
-
-        for task in self.tasks:
-            for person, share in task.implementors:
-                points = share * task.implementation_points
-                points_per_person[person] += points
-            for person, share in task.documenters:
-                points = share * task.documentation_points
-                points_per_person[person] += points
-            for person, share in task.integrators:
-                points = share * task.integration_points
-                points_per_person[person] += points
-
-        return ((person, points_per_person[person]) for person in self.persons)
-
-    def person_score(self, person):
+    def person_points(self, person):
         assert self.resolved
         assert type(person) is Person
         assert person in self.persons, (person.path, self.persons)
 
-        score = 0
+        implementation_points = documentation_points = integration_points = 0
 
         for task in self.tasks:
-            for p, share in task.implementors:
-                if p is person:
-                    score += task.implementation_points * share
-            for p, share in task.documenters:
-                if p is person:
-                    score += task.documentation_points * share
-            for p, share in task.integrators:
-                if p is person:
-                    score += task.integration_points * share
+            implementation_points += task.person_implementation_points(person)
+            documentation_points += task.person_documentation_points(person)
+            integration_points += task.person_integration_points(person)
 
-        return score
+        return implementation_points, documentation_points, integration_points, \
+            implementation_points + documentation_points + integration_points
 
     def tasks_of_person(self, person):
         assert self.resolved
@@ -65,9 +41,13 @@ class Project(Element):
                 her_tasks.add(task)
         return her_tasks
 
-    def stats(self):
+    def taskstats(self):
         for task in self.tasks:
             yield (task,) + task.stats()
+
+    def personstats(self):
+        for person in self.persons:
+            yield person, *self.person_points(person)
 
     def resolve(self, soup):
         persons = []

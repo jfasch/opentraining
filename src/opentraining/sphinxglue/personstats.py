@@ -81,9 +81,9 @@ def _ev_doctree_resolved__expand_personstats_nodes(app, doctree, docname):
                 p += utils.make_reference(text=task.title, from_docname=docname, to_docname=task.docname, app=app)
 
                 # points scored from that task
-                implementation_score = task.person_implementation_score(person)
-                documentation_score = task.person_documentation_score(person)
-                integration_score = task.person_integration_score(person)
+                implementation_score = task.person_implementation_points(person)
+                documentation_score = task.person_documentation_points(person)
+                integration_score = task.person_integration_points(person)
                 total_score = implementation_score + documentation_score + integration_score
 
                 entry = nodes.entry()
@@ -120,7 +120,8 @@ def _ev_doctree_resolved__expand_personstats_nodes(app, doctree, docname):
 
             entry = nodes.entry()
             row += entry
-            entry += nodes.Text(str(project.person_score(person)))
+            *_, total_points = project.person_points(person)
+            entry += nodes.Text(str(total_points))
 
         n.replace_self([table])
 

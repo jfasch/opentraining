@@ -83,7 +83,6 @@ def _ev_doctree_resolved__expand_project_taskstats_nodes(app, doctree, docname):
             tbody = nodes.tbody()
             tgroup += tbody
 
-            stats = project.stats()
             if n.sort_by == 'title': 
                 key=lambda s: s[0].title
             elif n.sort_by == 'percent-total':
@@ -98,6 +97,7 @@ def _ev_doctree_resolved__expand_project_taskstats_nodes(app, doctree, docname):
             else:
                 assert False, 'unknown sort_order: '+sort_order
 
+            stats = project.taskstats()
             for task, implementation_percent, documentation_percent, integration_percent, total_percent in sorted(stats, key=key, reverse=reverse):
                 row = nodes.row()
                 tbody += row

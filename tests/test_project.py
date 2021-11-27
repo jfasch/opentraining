@@ -134,19 +134,31 @@ def test_resolve():
     assert project.persons == [person]
     assert project.tasks == [task]
 
-def test_person_score(_f):
-    assert _f.project.person_score(_f.faschingbauer) == 70 * 100 # task_hi only
-
-def test_score_table(_f):
-    st = {person: score for person, score in _f.project.score_table()}
-    assert st[_f.faschingbauer] == 70*100
-    assert st[_f.huber] == 90*100 + 50*100 + 10*100
-    assert st[_f.queen] == 50*100 + 60*100
+def test_person_points(_f):
+    assert _f.project.person_points(_f.faschingbauer) == (70*100, 0, 0, 70*100) # task_hi only
 
 def test_tasks_of_person(_f):
     assert sorted(_f.project.tasks_of_person(_f.faschingbauer)) == sorted((_f.task_hi,))
 
-def test_stats(_f):
-    assert len(list(_f.project.stats())) == 2
-    for task, implementation_percent, documentation_percent, integration_percent, total_percent in _f.project.stats():
+def test_taskstats(_f):
+    assert len(list(_f.project.taskstats())) == 2
+    for task, implementation_percent, documentation_percent, integration_percent, total_percent in _f.project.taskstats():
         assert (implementation_percent, documentation_percent, integration_percent, total_percent) == task.stats()
+
+def test_personstats(_f):
+    assert len(list(_f.project.personstats())) == 3
+    for person, implementation_points, documentation_points, integration_points, total_points in _f.project.personstats():
+        if person is _f.faschingbauer:
+            assert implementation_points == 100*70
+            assert documentation_points == 0
+            assert integration_points == 0
+        elif person is _f.huber:
+            assert implementation_points == 100*50
+            assert documentation_points == 0
+            assert integration_points == 100*90 + 100*10
+        elif person is _f.queen:
+            assert implementation_points == 0
+            assert documentation_points == 100*50 + 100*60
+            assert integration_points == 0
+        else: 
+            assert False

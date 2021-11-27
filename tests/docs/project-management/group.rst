@@ -76,9 +76,35 @@ Project Stats: Persons (Default: By Name, Ascending)
 
 .. code-block:: rst
 
-   .. ot-project-personstats:: opentraining.tests.project_management.project1
+   .. ot-project-personstats:: opentraining.tests.project_management.project
 
-.. ot-project-personstats:: opentraining.tests.project_management.project1
+.. ot-project-personstats:: opentraining.tests.project_management.project
+
+Project Stats: Persons (Default: By Name, Descending)
+.....................................................
+
+.. code-block:: rst
+
+   .. ot-project-personstats:: opentraining.tests.project_management.project
+      :sort-by: name
+      :sort-order: descending
+
+.. ot-project-personstats:: opentraining.tests.project_management.project
+   :sort-by: name
+   :sort-order: descending
+
+Project Stats: Persons (Default: By Total-Points, Descending)
+.............................................................
+
+.. code-block:: rst
+
+   .. ot-project-personstats:: opentraining.tests.project_management.project
+      :sort-by: points-total
+      :sort-order: descending
+
+.. ot-project-personstats:: opentraining.tests.project_management.project
+   :sort-by: points-total
+   :sort-order: descending
 
 
 .. toctree::
