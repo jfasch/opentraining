@@ -52,19 +52,19 @@ Project  Stats (Default: By Title, Ascending)
 
 .. code-block:: rst
 
-   .. ot-projectstats:: opentraining.tests.project_management.project
+   .. ot-project-taskstats:: opentraining.tests.project_management.project
 
-.. ot-projectstats:: opentraining.tests.project_management.project
+.. ot-project-taskstats:: opentraining.tests.project_management.project
 
 Project Stats (By Title (Default), Descending)
 ..............................................
 
 .. code-block:: rst
 
-   .. ot-projectstats:: opentraining.tests.project_management.project
+   .. ot-project-taskstats:: opentraining.tests.project_management.project
       :sort-order: descending
 
-.. ot-projectstats:: opentraining.tests.project_management.project
+.. ot-project-taskstats:: opentraining.tests.project_management.project
    :sort-order: descending
 
 Project Stats (By Percent-Total, Descending)
@@ -72,11 +72,11 @@ Project Stats (By Percent-Total, Descending)
 
 .. code-block:: rst
 
-   .. ot-projectstats:: opentraining.tests.project_management.project
-      :sort-by: percent-total
-      :sort-order: descending
+   .. ot-project-taskstats:: opentraining.tests.project_management.project
+         :sort-by: percent-total
+	 :sort-order: descending
 
-.. ot-projectstats:: opentraining.tests.project_management.project
+.. ot-project-taskstats:: opentraining.tests.project_management.project
       :sort-by: percent-total
       :sort-order: descending
 

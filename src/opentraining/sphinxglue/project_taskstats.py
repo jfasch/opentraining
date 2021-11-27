@@ -17,11 +17,11 @@ _logger = logging.getLogger(__name__)
 
 
 def setup(app):
-    app.add_directive('ot-projectstats', _ProjectStatsDirective)
-    app.connect('doctree-resolved', _ev_doctree_resolved__expand_projectstats_nodes)
+    app.add_directive('ot-project-taskstats', _ProjectTaskStatsDirective)
+    app.connect('doctree-resolved', _ev_doctree_resolved__expand_project_taskstats_nodes)
 
-def _ev_doctree_resolved__expand_projectstats_nodes(app, doctree, docname):
-    for n in doctree.traverse(_ProjectStatsNode):
+def _ev_doctree_resolved__expand_project_taskstats_nodes(app, doctree, docname):
+    for n in doctree.traverse(_ProjectTaskStatsNode):
         try:
             project = app.ot_soup.element_by_path(n.project, userdata=n)
         except OpenTrainingError as e:
@@ -145,14 +145,14 @@ def _ev_doctree_resolved__expand_projectstats_nodes(app, doctree, docname):
 
         n.replace_self([table])
 
-class _ProjectStatsNode(nodes.Element):
+class _ProjectTaskStatsNode(nodes.Element):
     def __init__(self, project, sort_by, sort_order):
         super().__init__(self)
         self.project = project
         self.sort_by = sort_by
         self.sort_order = sort_order
 
-class _ProjectStatsDirective(SphinxDirective):
+class _ProjectTaskStatsDirective(SphinxDirective):
     required_arguments = 1   # path
     option_spec = {
         'sort-by': lambda argument: directives.choice(argument, ('title', 'percent-total')),
@@ -165,7 +165,7 @@ class _ProjectStatsDirective(SphinxDirective):
         sort_by = self.options.get('sort-by', 'title')
         sort_order = self.options.get('sort-order', 'ascending')
 
-        tasks = _ProjectStatsNode(
+        tasks = _ProjectTaskStatsNode(
             project = project, 
             sort_by = sort_by, 
             sort_order = sort_order)
