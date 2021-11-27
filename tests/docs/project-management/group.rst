@@ -38,17 +38,8 @@ Project Definition (Tasks and Persons Enumerated Explicitly)
    :tasks: opentraining.tests.project_management.task_lo,
 	   opentraining.tests.project_management.task_hi
 
-Score Table
-...........
-
-.. code-block:: rst
-
-   .. ot-scoretable:: opentraining.tests.project_management.project
-
-.. ot-scoretable:: opentraining.tests.project_management.project
-
-Project  Stats (Default: By Title, Ascending)
-.............................................
+Project Stats: Tasks (Default: By Title, Ascending)
+...................................................
 
 .. code-block:: rst
 
@@ -56,8 +47,8 @@ Project  Stats (Default: By Title, Ascending)
 
 .. ot-project-taskstats:: opentraining.tests.project_management.project
 
-Project Stats (By Title (Default), Descending)
-..............................................
+Project Stats: Tasks (By Title (Default), Descending)
+.....................................................
 
 .. code-block:: rst
 
@@ -67,8 +58,8 @@ Project Stats (By Title (Default), Descending)
 .. ot-project-taskstats:: opentraining.tests.project_management.project
    :sort-order: descending
 
-Project Stats (By Percent-Total, Descending)
-............................................
+Project Stats: Tasks (By Percent-Total, Descending)
+...................................................
 
 .. code-block:: rst
 
@@ -80,14 +71,14 @@ Project Stats (By Percent-Total, Descending)
       :sort-by: percent-total
       :sort-order: descending
 
-Score Table
-...........
+Project Stats: Persons (Default: By Name, Ascending)
+....................................................
 
 .. code-block:: rst
 
-   .. ot-scoretable:: opentraining.tests.project_management.project1
+   .. ot-project-personstats:: opentraining.tests.project_management.project1
 
-.. ot-scoretable:: opentraining.tests.project_management.project1
+.. ot-project-personstats:: opentraining.tests.project_management.project1
 
 
 .. toctree::

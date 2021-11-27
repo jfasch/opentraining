@@ -17,13 +17,13 @@ _logger = logging.getLogger(__name__)
 
 
 def setup(app):
-    app.add_directive('ot-scoretable', _ScoreTableDirective)
-    app.connect('doctree-resolved', _ev_doctree_resolved__expand_scoretable_nodes)
+    app.add_directive('ot-project-personstats', _ProjectPersonStatsDirective)
+    app.connect('doctree-resolved', _ev_doctree_resolved__expand_project_personstats_nodes)
 
-def _ev_doctree_resolved__expand_scoretable_nodes(app, doctree, docname):
-    for n in doctree.traverse(_ScoreTableNode):
+def _ev_doctree_resolved__expand_project_personstats_nodes(app, doctree, docname):
+    for n in doctree.traverse(_ProjectPersonStatsNode):
         try:
-            project = app.ot_soup.element_by_path(n.path, userdata=n)
+            project = app.ot_soup.element_by_path(n.project, userdata=n)
         except OpenTrainingError as e:
             _logger.warning(e, location=e.userdata)
             n.replace_self([])
@@ -74,22 +74,31 @@ def _ev_doctree_resolved__expand_scoretable_nodes(app, doctree, docname):
 
         n.replace_self([table])
 
-class _ScoreTableNode(nodes.Element):
-    def __init__(self, path):
+class _ProjectPersonStatsNode(nodes.Element):
+    def __init__(self, project, sort_by, sort_order):
         super().__init__(self)
-        self.path = path
+        self.project = project
+        self.sort_by = sort_by
+        self.sort_order = sort_order
         
-class _ScoreTableDirective(SphinxDirective):
-    required_arguments = 1   # path
+class _ProjectPersonStatsDirective(SphinxDirective):
+    required_arguments = 1   # project
     option_spec = {
-        'sort-by': utils.list_of_elementpath,
+        'sort-by': lambda argument: directives.choice(argument, ('name', 'points-total')),
+        'sort-order': lambda argument: directives.choice(argument, ('ascending', 'descending')),
     }
 
     def run(self):
-        path = utils.element_path(self.arguments[0].strip())
+        project = utils.element_path(self.arguments[0].strip())
 
-        scores = _ScoreTableNode(path = path)
-        scores.document = self.state.document
-        set_source_info(self, scores)
+        sort_by = self.options.get('sort-by', 'name')
+        sort_order = self.options.get('sort-order', 'ascending')
 
-        return [scores]
+        persons = _ProjectPersonStatsNode(
+            project = project, 
+            sort_by = sort_by, 
+            sort_order = sort_order)
+        persons.document = self.state.document
+        set_source_info(self, persons)
+
+        return [persons]
