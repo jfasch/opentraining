@@ -1,9 +1,9 @@
 from . import utils
 from . import soup
-from .. import errors
-from ..topic import Topic
-from ..project import Project
-from ..errors import OpenTrainingError
+from ..core import errors
+from ..core.topic import Topic
+from ..core.project import Project
+from ..core.errors import OpenTrainingError
 
 from sphinx.util.docutils import SphinxDirective
 from sphinx.util.nodes import set_source_info

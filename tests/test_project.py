@@ -1,8 +1,8 @@
-from opentraining.person import Person
-from opentraining.task import Task
-from opentraining.soup import Soup
-from opentraining.project import Project
-from opentraining import errors 
+from opentraining.core.person import Person
+from opentraining.core.task import Task
+from opentraining.core.soup import Soup
+from opentraining.core.project import Project
+from opentraining.core import errors 
 
 import pytest
 

@@ -1,7 +1,7 @@
 from . import utils
 from . import soup
-from .. import errors
-from ..topic import Topic
+from ..core import errors
+from ..core.topic import Topic
 
 from sphinx.util.docutils import SphinxDirective
 from sphinx.util.nodes import set_source_info

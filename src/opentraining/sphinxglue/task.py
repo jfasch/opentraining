@@ -1,7 +1,7 @@
 from . import utils
 from . import soup
-from .. import errors
-from ..task import Task
+from ..core import errors
+from ..core.task import Task
 
 from sphinx.util.docutils import SphinxDirective
 from sphinx.util.nodes import set_source_info

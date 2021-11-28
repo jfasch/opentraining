@@ -1,7 +1,7 @@
 from . import utils
 from . import soup
-from .. import errors
-from ..exercise import Exercise
+from ..core import errors
+from ..core.exercise import Exercise
 
 from sphinx.util.docutils import SphinxDirective
 from sphinx.util.nodes import set_source_info

@@ -1,10 +1,10 @@
-from ..soup import Soup
-from ..element import Element
-from ..topic import Topic
-from ..exercise import Exercise
-from ..task import Task
-from ..group import Group
-from .. import errors
+from ..core.soup import Soup
+from ..core.element import Element
+from ..core.topic import Topic
+from ..core.exercise import Exercise
+from ..core.task import Task
+from ..core.group import Group
+from ..core import errors
 
 from sphinx.util import logging
 _logger = logging.getLogger(__name__)

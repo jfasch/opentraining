@@ -1,7 +1,7 @@
-from opentraining.soup import Soup
-from opentraining.person import Person
-from opentraining.task import Task
-from opentraining.group import Group
+from opentraining.core.soup import Soup
+from opentraining.core.person import Person
+from opentraining.core.task import Task
+from opentraining.core.group import Group
 
 import pytest
 

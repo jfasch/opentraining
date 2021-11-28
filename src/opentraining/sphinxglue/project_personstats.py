@@ -1,10 +1,10 @@
 from . import utils
 from . import soup
-from ..project import Project
-from ..person import Person
-from ..task import Task
-from ..group import Group
-from ..errors import OpenTrainingError
+from ..core.project import Project
+from ..core.person import Person
+from ..core.task import Task
+from ..core.group import Group
+from ..core.errors import OpenTrainingError
 
 from sphinx.util.docutils import SphinxDirective
 from sphinx.util.nodes import set_source_info

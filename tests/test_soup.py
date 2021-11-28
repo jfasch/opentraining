@@ -1,7 +1,7 @@
-from opentraining.group import Group
-from opentraining.topic import Topic
-from opentraining.soup import Soup
-from opentraining.task import Task
+from opentraining.core.group import Group
+from opentraining.core.topic import Topic
+from opentraining.core.soup import Soup
+from opentraining.core.task import Task
 
 
 def test_1_level():

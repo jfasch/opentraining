@@ -1,6 +1,6 @@
 from . import utils
 from . import soup
-from ..task import Task
+from ..core.task import Task
 
 from sphinx.util.nodes import set_source_info
 from sphinx.util.docutils import SphinxDirective

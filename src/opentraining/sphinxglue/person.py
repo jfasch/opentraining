@@ -1,7 +1,7 @@
 from . import utils
 from . import soup
-from .. import errors
-from ..person import Person
+from ..core import errors
+from ..core.person import Person
 
 from sphinx.util.docutils import SphinxDirective
 from sphinx.util.nodes import set_source_info
