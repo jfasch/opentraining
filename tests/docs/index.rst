@@ -1,5 +1,5 @@
-Visual Appearence
-=================
+Demo/Test Pages
+===============
 
 .. toctree::
 

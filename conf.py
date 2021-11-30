@@ -36,6 +36,7 @@ templates_path = []
 extensions = [
     'sphinx_rtd_theme',
     'sphinx.ext.graphviz',
+    'sphinx.ext.autodoc',
 
     'opentraining',
 ]

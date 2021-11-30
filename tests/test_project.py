@@ -141,8 +141,8 @@ def test_tasks_of_person(_f):
     assert sorted(_f.project.tasks_of_person(_f.faschingbauer)) == sorted((_f.task_hi,))
 
 def test_taskstats(_f):
-    assert len(list(_f.project.taskstats())) == 2
-    for task, implementation_percent, documentation_percent, integration_percent, total_percent in _f.project.taskstats():
+    assert len(list(_f.project.task_stats())) == 2
+    for task, (implementation_percent, documentation_percent, integration_percent, total_percent) in _f.project.task_stats():
         assert (implementation_percent, documentation_percent, integration_percent, total_percent) == task.stats()
 
 def test_personstats(_f):
