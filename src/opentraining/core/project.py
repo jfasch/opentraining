@@ -16,6 +16,14 @@ class Project(Element):
         self.tasks = tasks
 
     def person_points(self, person):
+        '''Given a person, return that person's score as
+
+        :return: ``(implementation_points, documentation_points, integration_points, 
+                 implementation_points + documentation_points + integration_points)``
+        :rtype: ``(int, int, int, int)``
+
+        '''
+
         assert self.resolved
         assert type(person) is Person
         assert person in self.persons, (person.path, self.persons)
@@ -31,6 +39,8 @@ class Project(Element):
             implementation_points + documentation_points + integration_points
 
     def tasks_of_person(self, person):
+        '''Given a person, return an iterable over that person's tasks'''
+
         assert self.resolved
         assert type(person) is Person
         assert person in self.persons
@@ -41,9 +51,34 @@ class Project(Element):
                 her_tasks.add(task)
         return her_tasks
 
-    def taskstats(self):
+    def task_stats(self):
+        '''Returns iterable over tuples of the form
+
+        .. code-block:: python
+
+           (task, 
+              (implementation_percent,
+               documentation_percent, 
+               integration_percent, 
+               total_percent,
+              ),
+             )
+
+        Where
+
+        * ``task`` is a :py:class:`task.Task` object``
+        * ``implementation_percent``
+        * ``documentation_percent``
+        * ``integration_percent`` 
+        * ``total_percent``
+
+          These represent the completeness, in percent, of
+          ``task``. (``total_percent`` is the sum of the other three.)
+
+        '''
+
         for task in self.tasks:
-            yield (task,) + task.stats()
+            yield task, task.stats()
 
     def personstats(self):
         for person in self.persons:
