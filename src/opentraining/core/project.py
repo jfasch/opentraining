@@ -75,16 +75,40 @@ class Project(Element):
           These represent the completeness, in percent, of
           ``task``. (``total_percent`` is the sum of the other three.)
 
+        See also :py:meth:`task.Task.stats()``
+
         '''
 
         for task in self.tasks:
             yield task, task.stats()
 
-    def personstats(self):
+    def person_stats(self):
+        '''Returns iterable over tuples of the form
+
+        .. code-block:: python
+
+           (person, 
+              (implementation_points, 
+               documentation_points, 
+               integration_points, 
+               total_points)
+             )
+
+        Where
+
+        * ``person`` is a :py:class:`person.Person` object``
+        * ``implementation_points``
+        * ``documentation_points``
+        * ``integration_points`` 
+        * ``total_points``
+
+          These represent the respective scores of ``person`` in the
+          project. (``total_points`` is the sum of the other three.)
+
+        '''
+
         for person in self.persons:
-            row = [person]
-            row.extend(self.person_points(person))
-            yield row
+            yield person, self.person_points(person)
 
     def resolve(self, soup):
         persons = []

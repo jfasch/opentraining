@@ -13,3 +13,8 @@ Project Management
 .. autoclass:: Task
    :members:
    :undoc-members:
+
+.. automodule:: opentraining.core.person
+.. autoclass:: Person
+   :members:
+   :undoc-members:

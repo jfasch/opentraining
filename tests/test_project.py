@@ -146,8 +146,8 @@ def test_taskstats(_f):
         assert (implementation_percent, documentation_percent, integration_percent, total_percent) == task.stats()
 
 def test_personstats(_f):
-    assert len(list(_f.project.personstats())) == 3
-    for person, implementation_points, documentation_points, integration_points, total_points in _f.project.personstats():
+    assert len(list(_f.project.person_stats())) == 3
+    for person, (implementation_points, documentation_points, integration_points, total_points) in _f.project.person_stats():
         if person is _f.faschingbauer:
             assert implementation_points == 100*70
             assert documentation_points == 0

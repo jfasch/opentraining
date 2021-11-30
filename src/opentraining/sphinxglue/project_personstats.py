@@ -71,7 +71,7 @@ def _ev_doctree_resolved__expand_project_personstats_nodes(app, doctree, docname
             if n.sort_by == 'name': 
                 key=lambda s: (s[0].lastname, s[0].firstname)
             elif n.sort_by == 'points-total':
-                key=lambda s: s[4]
+                key=lambda s: s[1][3]
             else:
                 assert False, 'unknown sort_by: '+sort_by
 
@@ -82,8 +82,8 @@ def _ev_doctree_resolved__expand_project_personstats_nodes(app, doctree, docname
             else:
                 assert False, 'unknown sort_order: '+sort_order
 
-            stats = project.personstats()
-            for person, implementation_points, documentation_points, integration_points, total_points in sorted(stats, key=key, reverse=reverse):
+            stats = project.person_stats()
+            for person, (implementation_points, documentation_points, integration_points, total_points) in sorted(stats, key=key, reverse=reverse):
                 row = nodes.row()
                 tbody += row
 
