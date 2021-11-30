@@ -1,6 +1,7 @@
 from . import utils
 from . import soup
-from ..core import errors
+from .errors import log_and_swallow_error
+from ..core.errors import OpenTrainingError
 from ..core.topic import Topic
 from ..core.exercise import Exercise
 from ..core.task import Task
@@ -27,12 +28,11 @@ def setup(app):
 def _ev_doctree_resolved__expand_topicgraph_nodes(app, doctree, docname):
     '''"doctree-resolved" event handler to expand topic graph nodes'''
     try:
-        soup.sphinx_create_soup(app)
         expander = _GraphExpander(app=app, docname=docname)
         for n in doctree.traverse(_GraphNode):
             expander.expand(n)
-    except OpenTrainingError as err:
-        _logger.warning(f'{docname}: cannot expand topic graph, errors follow ...\n{err}', location=err.userdata)
+    except OpenTrainingError as e:
+        log_and_swallow_error(e, _logger)
 
 class _GraphNode(nodes.Element):
     def __init__(self, entries):
@@ -60,14 +60,14 @@ class _GraphExpander:
             dot = self._graph_to_dot(graph=graph, hilit_nodes=hilit_nodes, node=node)
             svg = self._dot_to_svg(dot=dot, node=node)
             node.replace_self(nodes.raw(svg, svg, format='html'))
-        except errors.OpenTrainingError as e:
+        except:
             node.replace_self([])
             raise
 
     def _graphnode_to_graph(self, node):
         assert isinstance(node, _GraphNode)
 
-        worldgraph = self._app.ot_soup.worldgraph()
+        worldgraph = self._app.soup().worldgraph()
         if len(node.entries) == 0:
             return worldgraph, set()
 
@@ -77,7 +77,7 @@ class _GraphExpander:
         hilit_nodes = set()
 
         for entry_path in node.entries:
-            entry = self._app.ot_soup.element_by_path(entry_path, userdata=node)
+            entry = self._app.soup().element_by_path(entry_path, userdata=node)
             if isinstance(entry, Node):
                 node_entries.add(entry)
                 hilit_nodes.add(entry)
@@ -88,7 +88,7 @@ class _GraphExpander:
             else:
                 assert False, entry_path
 
-        return self._app.ot_soup.subgraph(node_entries, userdata=node), hilit_nodes
+        return self._app.soup().subgraph(node_entries, userdata=node), hilit_nodes
 
     def _graph_to_dot(self, graph, hilit_nodes, node):
         lines = [
@@ -112,9 +112,9 @@ class _GraphExpander:
             self.nodes = []  # leaf topics
 
     def _dot_group_clusters(self, graph, node):
-        root_cluster = self.Cluster(self._app.ot_soup.root)
+        root_cluster = self.Cluster(self._app.soup().root)
 
-        have_clusters = { self._app.ot_soup.root: root_cluster }
+        have_clusters = { self._app.soup().root: root_cluster }
         # walk topics and create cluster hierarchy from their
         # containing groups
         for n in graph.nodes:
@@ -138,7 +138,7 @@ class _GraphExpander:
 
     def _dot_cluster_lines(self, cluster, hilit_nodes, node):
         lines = []
-        if cluster.group is not self._app.ot_soup.root:
+        if cluster.group is not self._app.soup().root:
             lines.append('subgraph cluster_' + self._dot_id_from_path(cluster.group.path) + '{')
             lines.append(f'label = "{cluster.group.title}";')
             lines.append('style = rounded;')  # rounded corners
@@ -148,7 +148,7 @@ class _GraphExpander:
         for subcluster in cluster.clusters:
             lines.extend(self._dot_cluster_lines(subcluster, hilit_nodes, node=node))
 
-        if cluster.group is not self._app.ot_soup.root:
+        if cluster.group is not self._app.soup().root:
             lines.append('}')
         return lines
 

@@ -1,6 +1,7 @@
 from . import utils
 from . import soup
-from ..core import errors
+from .errors import log_and_swallow_error, remove_nodes
+from ..core.errors import OpenTrainingError
 from ..core.topic import Topic
 from ..core.group import Group
 from ..core.errors import OpenTrainingError
@@ -12,7 +13,7 @@ from docutils import nodes
 
 from networkx.algorithms.dag import topological_sort
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 def setup(app):
@@ -21,13 +22,12 @@ def setup(app):
 
 def _ev_doctree_resolved__expand_grouplist_nodes(app, doctree, docname):
     try:
-        soup.sphinx_create_soup(app)
         expander = _GroupListExpander(app=app, docname=docname)
         for n in doctree.traverse(_GroupListNode):
-            expander.expand(n)
-    except Exception:
-        logger.exception(f'{docname}: cannot expand grouplist')
-        raise
+            n.replace_self(expander.expand(n))
+    except OpenTrainingError as e:
+        remove_nodes(doctree, _GroupListNode)
+        log_and_swallow_error(e, _logger)
 
 class _GroupListNode(nodes.Element):
     def __init__(self, path):
@@ -52,9 +52,9 @@ class _GroupListExpander:
         self._docname = docname
 
     def expand(self, node):
-        group = self._app.ot_soup.element_by_path(node.path, userdata=node)
+        group = self._app.soup().element_by_path(node.path, userdata=node)
         topics = group.iter_recursive(cls=Topic)
-        graph = self._app.ot_soup.worldgraph().subgraph(topics)
+        graph = self._app.soup().worldgraph().subgraph(topics)
         topo = topological_sort(graph)
 
         bl = nodes.bullet_list()
@@ -64,17 +64,17 @@ class _GroupListExpander:
             li = nodes.list_item()
             li += self._topic_paragraph(topic.path, userdata=node)
             bl += li
-        node.replace_self(bl)
+        return bl
 
     def _topic_paragraph(self, path, userdata):
-        topic = self._app.ot_soup.element_by_path(path, userdata=userdata)
+        topic = self._app.soup().element_by_path(path, userdata=userdata)
         assert isinstance(topic, Topic), f'dependency on non-topic {path}?'
         p = nodes.paragraph()
         p += self._topic_headline_elems(path, userdata=userdata)
         return p
 
     def _topic_headline_elems(self, path, userdata):
-        topic = self._app.ot_soup.element_by_path(path, userdata=userdata)
+        topic = self._app.soup().element_by_path(path, userdata=userdata)
         elems = []
         elems.append(nodes.Text(f'{topic.title} ('))
 

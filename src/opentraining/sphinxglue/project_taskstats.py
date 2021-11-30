@@ -1,5 +1,6 @@
 from . import utils
 from . import soup
+from .errors import log_and_swallow_error, remove_nodes
 from ..core.project import Project
 from ..core.person import Person
 from ..core.task import Task
@@ -21,129 +22,128 @@ def setup(app):
     app.connect('doctree-resolved', _ev_doctree_resolved__expand_project_taskstats_nodes)
 
 def _ev_doctree_resolved__expand_project_taskstats_nodes(app, doctree, docname):
-    for n in doctree.traverse(_ProjectTaskStatsNode):
-        try:
-            project = app.ot_soup.element_by_path(n.project, userdata=n)
-        except OpenTrainingError as e:
-            _logger.warning(e, location=e.userdata)
-            n.replace_self([])
-            continue
+    try:
+        for n in doctree.traverse(_ProjectTaskStatsNode):
+            project = app.soup().element_by_path(n.project, userdata=n)
 
-        table = nodes.table()
-        tgroup = nodes.tgroup(cols=8)
-        table += tgroup
-        tgroup += nodes.colspec(colwidth=8)
-        tgroup += nodes.colspec(colwidth=4)
-        tgroup += nodes.colspec(colwidth=1)
-        tgroup += nodes.colspec(colwidth=4)
-        tgroup += nodes.colspec(colwidth=1)
-        tgroup += nodes.colspec(colwidth=4)
-        tgroup += nodes.colspec(colwidth=1)
-        tgroup += nodes.colspec(colwidth=2)
+            table = nodes.table()
+            tgroup = nodes.tgroup(cols=8)
+            table += tgroup
+            tgroup += nodes.colspec(colwidth=8)
+            tgroup += nodes.colspec(colwidth=4)
+            tgroup += nodes.colspec(colwidth=1)
+            tgroup += nodes.colspec(colwidth=4)
+            tgroup += nodes.colspec(colwidth=1)
+            tgroup += nodes.colspec(colwidth=4)
+            tgroup += nodes.colspec(colwidth=1)
+            tgroup += nodes.colspec(colwidth=2)
 
-        if 'thead':
-            thead = nodes.thead()
-            tgroup += thead
-            row = nodes.row()
-            thead += row
-
-            entry = nodes.entry()
-            row += entry
-            entry += nodes.Text('Task')
-
-            entry = nodes.entry()
-            row += entry
-            entry += nodes.Text('Implementation Points')
-
-            entry = nodes.entry()
-            row += entry
-            entry += nodes.Text('%')
-
-            entry = nodes.entry()
-            row += entry
-            entry += nodes.Text('Documentation Points')
-
-            entry = nodes.entry()
-            row += entry
-            entry += nodes.Text('%')
-
-            entry = nodes.entry()
-            row += entry
-            entry += nodes.Text('Integration Points')
-
-            entry = nodes.entry()
-            row += entry
-            entry += nodes.Text('%')
-
-            entry = nodes.entry()
-            row += entry
-            entry += nodes.Text('% Total')
-
-        if 'tbody':
-            tbody = nodes.tbody()
-            tgroup += tbody
-
-            if n.sort_by == 'title': 
-                key=lambda s: s[0].title
-            elif n.sort_by == 'percent-total':
-                key=lambda s: s[1][3]
-            else:
-                assert False, 'unknown sort_by: '+sort_by
-
-            if n.sort_order == 'ascending':
-                reverse = False
-            elif n.sort_order == 'descending':
-                reverse = True
-            else:
-                assert False, 'unknown sort_order: '+sort_order
-
-            stats = project.task_stats()
-            for task, (implementation_percent, documentation_percent, integration_percent, total_percent) in sorted(stats, key=key, reverse=reverse):
+            if 'thead':
+                thead = nodes.thead()
+                tgroup += thead
                 row = nodes.row()
-                tbody += row
-
-                # link to task
-                entry = nodes.entry()
-                row += entry
-                p = nodes.paragraph()
-                entry += p
-                p += [utils.make_reference(text=task.title,
-                                           from_docname=docname, to_docname=task.docname,
-                                           app=app)]
-
-                # implementation
-                entry = nodes.entry()
-                row += entry
-                entry += nodes.Text(str(task.implementation_points))
+                thead += row
 
                 entry = nodes.entry()
                 row += entry
-                entry += nodes.Text(str(round(implementation_percent, 2)))
-
-                # documentation
-                entry = nodes.entry()
-                row += entry
-                entry += nodes.Text(str(task.documentation_points))
+                entry += nodes.Text('Task')
 
                 entry = nodes.entry()
                 row += entry
-                entry += nodes.Text(str(round(documentation_percent, 2)))
-
-                # integration
-                entry = nodes.entry()
-                row += entry
-                entry += nodes.Text(str(task.integration_points))
+                entry += nodes.Text('Implementation Points')
 
                 entry = nodes.entry()
                 row += entry
-                entry += nodes.Text(str(round(integration_percent, 2)))
+                entry += nodes.Text('%')
 
-                # total
                 entry = nodes.entry()
                 row += entry
-                entry += nodes.Text(str(round(total_percent, 2)))
+                entry += nodes.Text('Documentation Points')
 
-        n.replace_self([table])
+                entry = nodes.entry()
+                row += entry
+                entry += nodes.Text('%')
+
+                entry = nodes.entry()
+                row += entry
+                entry += nodes.Text('Integration Points')
+
+                entry = nodes.entry()
+                row += entry
+                entry += nodes.Text('%')
+
+                entry = nodes.entry()
+                row += entry
+                entry += nodes.Text('% Total')
+
+            if 'tbody':
+                tbody = nodes.tbody()
+                tgroup += tbody
+
+                if n.sort_by == 'title': 
+                    key=lambda s: s[0].title
+                elif n.sort_by == 'percent-total':
+                    key=lambda s: s[1][3]
+                else:
+                    assert False, 'unknown sort_by: '+sort_by
+
+                if n.sort_order == 'ascending':
+                    reverse = False
+                elif n.sort_order == 'descending':
+                    reverse = True
+                else:
+                    assert False, 'unknown sort_order: '+sort_order
+
+                stats = project.task_stats()
+                for task, (implementation_percent, documentation_percent, integration_percent, total_percent) in sorted(stats, key=key, reverse=reverse):
+                    row = nodes.row()
+                    tbody += row
+
+                    # link to task
+                    entry = nodes.entry()
+                    row += entry
+                    p = nodes.paragraph()
+                    entry += p
+                    p += [utils.make_reference(text=task.title,
+                                               from_docname=docname, to_docname=task.docname,
+                                               app=app)]
+
+                    # implementation
+                    entry = nodes.entry()
+                    row += entry
+                    entry += nodes.Text(str(task.implementation_points))
+
+                    entry = nodes.entry()
+                    row += entry
+                    entry += nodes.Text(str(round(implementation_percent, 2)))
+
+                    # documentation
+                    entry = nodes.entry()
+                    row += entry
+                    entry += nodes.Text(str(task.documentation_points))
+
+                    entry = nodes.entry()
+                    row += entry
+                    entry += nodes.Text(str(round(documentation_percent, 2)))
+
+                    # integration
+                    entry = nodes.entry()
+                    row += entry
+                    entry += nodes.Text(str(task.integration_points))
+
+                    entry = nodes.entry()
+                    row += entry
+                    entry += nodes.Text(str(round(integration_percent, 2)))
+
+                    # total
+                    entry = nodes.entry()
+                    row += entry
+                    entry += nodes.Text(str(round(total_percent, 2)))
+
+            n.replace_self([table])
+    except OpenTrainingError as e:
+        remove_nodes(doctree, _ProjectTaskStatsNode)
+        log_and_swallow_error(e, _logger)
 
 class _ProjectTaskStatsNode(nodes.Element):
     def __init__(self, project, sort_by, sort_order):

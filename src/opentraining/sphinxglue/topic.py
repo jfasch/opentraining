@@ -1,6 +1,7 @@
 from . import utils
 from . import soup
-from ..core import errors
+from .errors import log_and_swallow_error
+from ..core.errors import OpenTrainingError
 from ..core.topic import Topic
 
 from sphinx.util.docutils import SphinxDirective
@@ -8,7 +9,7 @@ from sphinx.util.nodes import set_source_info
 from sphinx.util import logging
 from docutils import nodes
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 def setup(app):
@@ -31,9 +32,8 @@ def _ev_doctree_read__extract_topicnodes(app, doctree):
                 dependencies=n.dependencies,
             ))
             n.replace_self([])
-    except Exception:
-        logger.exception(f'{docname}: cannot extract topic nodes')
-        raise
+    except OpenTrainingError as e:
+        log_and_swallow_error(e, _logger)
         
 class _TopicNode(nodes.Element):
     def __init__(self, path, dependencies):

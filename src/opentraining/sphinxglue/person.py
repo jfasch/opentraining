@@ -1,6 +1,7 @@
 from . import utils
 from . import soup
-from ..core import errors
+from .errors import log_and_swallow_error
+from ..core.errors import OpenTrainingError
 from ..core.person import Person
 
 from sphinx.util.docutils import SphinxDirective
@@ -8,7 +9,7 @@ from sphinx.util.nodes import set_source_info
 from sphinx.util import logging
 from docutils import nodes
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 def setup(app):
@@ -32,9 +33,8 @@ def _ev_doctree_read__extract_personnodes(app, doctree):
                 lastname=n.lastname,
             ))
             n.replace_self([])
-    except Exception:
-        logger.exception(f'{docname}: cannot extract person nodes')
-        raise
+    except OpenTrainingError as e:
+        log_and_swallow_error(e, _logger)
         
 class _PersonNode(nodes.Element):
     def __init__(self, path, firstname, lastname):

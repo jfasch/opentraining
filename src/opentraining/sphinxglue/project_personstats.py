@@ -1,5 +1,5 @@
 from . import utils
-from . import soup
+from .errors import log_and_swallow_error, remove_nodes
 from ..core.project import Project
 from ..core.person import Person
 from ..core.task import Task
@@ -21,102 +21,101 @@ def setup(app):
     app.connect('doctree-resolved', _ev_doctree_resolved__expand_project_personstats_nodes)
 
 def _ev_doctree_resolved__expand_project_personstats_nodes(app, doctree, docname):
-    for n in doctree.traverse(_ProjectPersonStatsNode):
-        try:
-            project = app.ot_soup.element_by_path(n.project, userdata=n)
-        except OpenTrainingError as e:
-            _logger.warning(e, location=e.userdata)
-            n.replace_self([])
-            continue
+    try:
+        for n in doctree.traverse(_ProjectPersonStatsNode):
+            project = app.soup().element_by_path(n.project, userdata=n)
 
-        table = nodes.table()
-        tgroup = nodes.tgroup(cols=5)
-        table += tgroup
-        tgroup += nodes.colspec(colwidth=8)
-        tgroup += nodes.colspec(colwidth=4)
-        tgroup += nodes.colspec(colwidth=4)
-        tgroup += nodes.colspec(colwidth=4)
-        tgroup += nodes.colspec(colwidth=4)
+            table = nodes.table()
+            tgroup = nodes.tgroup(cols=5)
+            table += tgroup
+            tgroup += nodes.colspec(colwidth=8)
+            tgroup += nodes.colspec(colwidth=4)
+            tgroup += nodes.colspec(colwidth=4)
+            tgroup += nodes.colspec(colwidth=4)
+            tgroup += nodes.colspec(colwidth=4)
 
-        if 'thead':
-            thead = nodes.thead()
-            tgroup += thead
-            row = nodes.row()
-            thead += row
-
-            entry = nodes.entry()
-            row += entry
-            entry += nodes.Text('Person')
-
-            entry = nodes.entry()
-            row += entry
-            entry += nodes.Text('Implementation')
-
-            entry = nodes.entry()
-            row += entry
-            entry += nodes.Text('Documentation')
-
-            entry = nodes.entry()
-            row += entry
-            entry += nodes.Text('Integration')
-
-            entry = nodes.entry()
-            row += entry
-            entry += nodes.Text('Total')
-
-        if 'tbody':
-            tbody = nodes.tbody()
-            tgroup += tbody
-
-            if n.sort_by == 'name': 
-                key=lambda s: (s[0].lastname, s[0].firstname)
-            elif n.sort_by == 'points-total':
-                key=lambda s: s[1][3]
-            else:
-                assert False, 'unknown sort_by: '+sort_by
-
-            if n.sort_order == 'ascending':
-                reverse = False
-            elif n.sort_order == 'descending':
-                reverse = True
-            else:
-                assert False, 'unknown sort_order: '+sort_order
-
-            stats = project.person_stats()
-            for person, (implementation_points, documentation_points, integration_points, total_points) in sorted(stats, key=key, reverse=reverse):
+            if 'thead':
+                thead = nodes.thead()
+                tgroup += thead
                 row = nodes.row()
-                tbody += row
+                thead += row
 
-                # link to person
                 entry = nodes.entry()
                 row += entry
-                p = nodes.paragraph()
-                entry += p
-                if person.firstname and person.lastname:
-                    text = f' {person.lastname} {person.firstname}'
+                entry += nodes.Text('Person')
+
+                entry = nodes.entry()
+                row += entry
+                entry += nodes.Text('Implementation')
+
+                entry = nodes.entry()
+                row += entry
+                entry += nodes.Text('Documentation')
+
+                entry = nodes.entry()
+                row += entry
+                entry += nodes.Text('Integration')
+
+                entry = nodes.entry()
+                row += entry
+                entry += nodes.Text('Total')
+
+            if 'tbody':
+                tbody = nodes.tbody()
+                tgroup += tbody
+
+                if n.sort_by == 'name': 
+                    key=lambda s: (s[0].lastname, s[0].firstname)
+                elif n.sort_by == 'points-total':
+                    key=lambda s: s[1][3]
                 else:
-                    text = person.title
-                p += [utils.make_reference(text=text,
-                                           from_docname=docname, to_docname=person.docname,
-                                           app=app)]
+                    assert False, 'unknown sort_by: '+sort_by
 
-                entry = nodes.entry()
-                row += entry
-                entry += nodes.Text(str(implementation_points))
+                if n.sort_order == 'ascending':
+                    reverse = False
+                elif n.sort_order == 'descending':
+                    reverse = True
+                else:
+                    assert False, 'unknown sort_order: '+sort_order
 
-                entry = nodes.entry()
-                row += entry
-                entry += nodes.Text(str(documentation_points))
+                stats = project.person_stats()
+                for person, (implementation_points, documentation_points, integration_points, total_points) in sorted(stats, key=key, reverse=reverse):
+                    row = nodes.row()
+                    tbody += row
 
-                entry = nodes.entry()
-                row += entry
-                entry += nodes.Text(str(integration_points))
+                    # link to person
+                    entry = nodes.entry()
+                    row += entry
+                    p = nodes.paragraph()
+                    entry += p
+                    if person.firstname and person.lastname:
+                        text = f' {person.lastname} {person.firstname}'
+                    else:
+                        text = person.title
+                    p += [utils.make_reference(text=text,
+                                               from_docname=docname, to_docname=person.docname,
+                                               app=app)]
 
-                entry = nodes.entry()
-                row += entry
-                entry += nodes.Text(str(total_points))
+                    entry = nodes.entry()
+                    row += entry
+                    entry += nodes.Text(str(implementation_points))
 
-        n.replace_self([table])
+                    entry = nodes.entry()
+                    row += entry
+                    entry += nodes.Text(str(documentation_points))
+
+                    entry = nodes.entry()
+                    row += entry
+                    entry += nodes.Text(str(integration_points))
+
+                    entry = nodes.entry()
+                    row += entry
+                    entry += nodes.Text(str(total_points))
+
+            n.replace_self([table])
+    except OpenTrainingError as e:
+        remove_nodes(doctree, _ProjectPersonStatsNode)
+        log_and_swallow_error(e, _logger)
 
 class _ProjectPersonStatsNode(nodes.Element):
     def __init__(self, project, sort_by, sort_order):

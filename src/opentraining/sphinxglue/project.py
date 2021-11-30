@@ -1,5 +1,7 @@
 from . import utils
 from . import soup
+from .errors import log_and_swallow_error
+from ..core.errors import OpenTrainingError
 from ..core import errors
 from ..core.topic import Topic
 from ..core.project import Project
@@ -32,9 +34,8 @@ def _ev_doctree_read__extract_projectnodes(app, doctree):
                 tasks = n.tasks,
             ))
             n.replace_self([])
-    except Exception:
-        _logger.exception(f'{docname}: cannot extract project nodes')
-        raise
+    except OpenTrainingError as e:
+        log_and_swallow_error(e, _logger)
 
 class _ProjectNode(nodes.Element):
     def __init__(self, path, persons, tasks):

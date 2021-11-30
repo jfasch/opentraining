@@ -111,8 +111,6 @@ class Soup:
         collected_errors = []
 
         for elem in root.iter_recursive(cls=Node):
-            if not isinstance(elem, Node):
-                continue
             worldgraph.add_node(elem)
             for target_path in elem.dependencies:
                 try:

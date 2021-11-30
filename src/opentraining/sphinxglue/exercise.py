@@ -1,6 +1,7 @@
 from . import utils
 from . import soup
-from ..core import errors
+from .errors import log_and_swallow_error
+from ..core.errors import OpenTrainingError
 from ..core.exercise import Exercise
 
 from sphinx.util.docutils import SphinxDirective
@@ -20,7 +21,7 @@ def _ev_doctree_read__extract_exercisenodes(app, doctree):
         docname = app.env.docname
         exercise_nodes = list(doctree.traverse(_ExerciseNode))
         if len(exercise_nodes) > 1:
-            raise errors.OpenTrainingError(f'{docname} contains multiple exercises')
+            raise OpenTrainingError(f'{docname} contains multiple exercises')
 
         for n in exercise_nodes:
             soup.sphinx_add_element(app, Exercise(
@@ -31,9 +32,8 @@ def _ev_doctree_read__extract_exercisenodes(app, doctree):
                 dependencies=n.dependencies,
             ))
             n.replace_self([])
-    except Exception:
-        logger.exception(f'{docname}: cannot extract topic nodes')
-        raise
+    except OpenTrainingError as e:
+        log_and_swallow_error(e, _logger)
         
 class _ExerciseNode(nodes.Element):
     def __init__(self, path, dependencies):
