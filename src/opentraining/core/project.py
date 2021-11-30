@@ -47,7 +47,9 @@ class Project(Element):
 
     def personstats(self):
         for person in self.persons:
-            yield person, *self.person_points(person)
+            row = [person]
+            row.extend(self.person_points(person))
+            yield row
 
     def resolve(self, soup):
         persons = []
