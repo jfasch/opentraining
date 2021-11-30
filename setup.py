@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='opentraining',
-    version='0.8.1',
+    version='0.8.2',
     description='A set of Sphinx extensions to manage training material',
 
     # long_description='blah',
@@ -32,6 +32,7 @@ setup(
     package_dir = {'': 'src'},
     packages = [
         'opentraining',
+        'opentraining.core',
         'opentraining.sphinxglue',
     ],
     python_requires='>=3.6, <4',
