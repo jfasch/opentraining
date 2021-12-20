@@ -20,6 +20,6 @@ def log_and_swallow_error(error, logger):
         for e in error:
             logger.warning(str(e), location=e.userdata)
     elif isinstance(error, OpenTrainingError):
-        logger.warning(str(error), location=err.userdata)
+        logger.warning(str(error), location=error.userdata)
     else:
         assert False, 'called with something not from here:' + str(error)
