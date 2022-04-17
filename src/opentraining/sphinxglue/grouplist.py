@@ -4,6 +4,7 @@ from .errors import log_and_swallow_error, remove_nodes
 from ..core.errors import OpenTrainingError
 from ..core.topic import Topic
 from ..core.group import Group
+from ..core.node import Node
 from ..core.errors import OpenTrainingError
 
 from sphinx.util.docutils import SphinxDirective
@@ -53,13 +54,13 @@ class _GroupListExpander:
 
     def expand(self, node):
         group = self._app.soup().element_by_path(node.path, userdata=node)
-        topics = group.iter_recursive(cls=Topic)
+        topics = list(group.iter_recursive(cls=Node))
         graph = self._app.soup().worldgraph().subgraph(topics)
-        topo = topological_sort(graph)
+        topo = list(topological_sort(graph))
 
         bl = nodes.bullet_list()
-        for topic in reversed(list(topo)):
-            if not isinstance(topic, Topic):
+        for topic in reversed(topo):
+            if not isinstance(topic, Node):
                 continue
             li = nodes.list_item()
             li += self._topic_paragraph(topic.path, userdata=node)
@@ -68,7 +69,7 @@ class _GroupListExpander:
 
     def _topic_paragraph(self, path, userdata):
         topic = self._app.soup().element_by_path(path, userdata=userdata)
-        assert isinstance(topic, Topic), f'dependency on non-topic {path}?'
+        assert isinstance(topic, Node), f'dependency on non-topic {path}?'
         p = nodes.paragraph()
         p += self._topic_headline_elems(path, userdata=userdata)
         return p
