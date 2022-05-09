@@ -29,7 +29,8 @@ class Group(Element):
             parent = self._children.get(child_name)
             if parent is None:
                 raise errors.OpenTrainingError(f'{self}: cannot add "{element._requested_path}": '
-                                        f'intermediate "{child_name}" does not exist')
+                                               f'intermediate "{child_name}" does not exist',
+                                               userdata=userdata)
             element._requested_path = element._requested_path[1:]
             parent.add_element(element, userdata=self.userdata)
 
